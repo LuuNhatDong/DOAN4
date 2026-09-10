@@ -1,0 +1,200 @@
+@model IEnumerable<QuanLyThucTap.Models.PhanCongHuongDan>
+@{
+    ViewData["Title"] = "Yêu cầu hướng dẫn thực tập";
+    var gv = ViewBag.GiangVien as QuanLyThucTap.Models.GiangVien;
+    int dangHuongDan = (int)(ViewBag.DangHuongDan ?? 0);
+    int conLai = (int)(ViewBag.ConLai ?? 0);
+    int soLuongToiDa = gv?.SoLuongToiDa ?? 0;
+    bool daDay = dangHuongDan >= soLuongToiDa;
+
+    var yeuCauChoDuyet = Model.Where(p => p.TrangThaiDuyet == "cho_gv_duyet").ToList();
+    var yeuCauTuChoi = Model.Where(p => p.TrangThaiDuyet == "gv_tu_choi").ToList();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">
+            <i class="bi bi-person-plus-fill text-primary me-2"></i>
+            Yêu Cầu Hướng Dẫn Thực Tập Từ Sinh Viên
+        </h4>
+        <p class="text-muted small mb-0">
+            Giảng viên: <strong>@gv?.Hovaten (@gv?.HocVi)</strong> - Bộ môn: @gv?.BoMon
+        </p>
+    </div>
+    <div>
+        <span class="badge @(daDay ? "bg-danger" : "bg-success") px-3 py-2 fs-7 rounded-pill">
+            <i class="bi bi-people-fill me-1"></i> Đã nhận: @dangHuongDan / @soLuongToiDa SV (Còn @conLai chỉ tiêu)
+        </span>
+    </div>
+</div>
+
+@if (daDay)
+{
+    <div class="alert alert-warning border-start border-4 border-warning mb-4 shadow-sm">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-exclamation-triangle-fill fs-3 text-warning me-3"></i>
+            <div>
+                <h6 class="fw-bold mb-1">Chỉ tiêu hướng dẫn đã đạt mức tối đa</h6>
+                <p class="small mb-0">
+                    Bạn đã nhận đủ @soLuongToiDa/@soLuongToiDa sinh viên theo quy định của Khoa. Bạn không thể chấp nhận thêm yêu cầu mới trừ khi tăng chỉ tiêu hoặc hủy bớt sinh viên.
+                </p>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Danh sách sinh viên đang chờ GVHD xét duyệt -->
+<div class="card overflow-hidden mb-4">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0 text-primary">
+            <i class="bi bi-clock-history me-2"></i>
+            Danh Sách Yêu Cầu Chờ Phản Hồi (@yeuCauChoDuyet.Count)
+        </h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>MSSV</th>
+                    <th>Họ và Tên</th>
+                    <th>Lớp & Ngành</th>
+                    <th>Nơi Thực Tập</th>
+                    <th>Vị Trí & Thời Gian</th>
+                    <th class="text-end">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!yeuCauChoDuyet.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-check2-circle text-success fs-1 d-block mb-2"></i>
+                            Hiện không có yêu cầu hướng dẫn nào đang chờ bạn phản hồi.
+                        </td>
+                    </tr>
+                }
+                @foreach (var item in yeuCauChoDuyet)
+                {
+                    var sv = item.SinhVien;
+                    <tr>
+                        <td class="fw-bold text-primary">@sv?.Mssv</td>
+                        <td>
+                            <div class="fw-bold text-dark">@sv?.Hovaten</div>
+                            <small class="text-muted d-block">
+                                <i class="bi bi-envelope me-1"></i>@sv?.Email
+                                @if (!string.IsNullOrEmpty(sv?.Sdt))
+                                {
+                                    <span class="ms-2"><i class="bi bi-telephone me-1"></i>@sv.Sdt</span>
+                                }
+                            </small>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border">@sv?.Lop</span>
+                            <small class="text-muted d-block">@sv?.ChuyenNganh - GPA: @(sv?.Gpa.ToString("0.00") ?? "---")</small>
+                        </td>
+                        <td>
+                            <strong class="text-dark">@(item.DoanhNghiep?.TenDoanhNghiep ?? item.TenCtyNgoai ?? "Doanh nghiệp CNTT")</strong>
+                        </td>
+                        <td>
+                            <div class="small fw-semibold text-dark">@(item.ViTriThucTap ?? "Thực tập sinh")</div>
+                            <small class="text-muted"><i class="bi bi-calendar3 me-1"></i>@item.SoThangThucTap tháng</small>
+                        </td>
+                        <td class="text-end" style="white-space: nowrap; width: 1%;">
+                            <div class="d-inline-flex gap-2 align-items-center">
+                                <!-- Nút Chấp nhận -->
+                                <form asp-action="ChapNhan" method="post" class="d-inline m-0 p-0">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="phanCongId" value="@item.Id" />
+                                    <button type="submit" class="btn btn-sm btn-success d-inline-flex align-items-center gap-1" 
+                                            @(daDay ? "disabled" : "") title="@(daDay ? "Đã đủ chỉ tiêu" : "Chấp nhận hướng dẫn sinh viên này")">
+                                        <i class="bi bi-check-circle-fill"></i> Chấp nhận
+                                    </button>
+                                </form>
+
+                                <!-- Nút Từ chối (mở Modal nhập lý do) -->
+                                <button type="button" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1" 
+                                        data-bs-toggle="modal" data-bs-target="#modalTuChoi_@item.Id" title="Từ chối yêu cầu">
+                                    <i class="bi bi-x-circle"></i> Từ chối
+                                </button>
+                            </div>
+
+                            <!-- Modal Từ Chối Nhập Lý Do -->
+                            <div class="modal fade text-start" id="modalTuChoi_@item.Id" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form asp-action="TuChoi" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="phanCongId" value="@item.Id" />
+
+                                            <div class="modal-header">
+                                                <h5 class="modal-title fw-bold text-danger">
+                                                    <i class="bi bi-exclamation-octagon me-1"></i> Từ Chối Hướng Dẫn
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="alert alert-light border small mb-3">
+                                                    <strong>Sinh viên:</strong> @sv?.Hovaten (@sv?.Mssv) - Lớp: @sv?.Lop<br />
+                                                    <strong>Ngành:</strong> @sv?.ChuyenNganh - <strong>GPA:</strong> @(sv?.Gpa.ToString("0.00") ?? "---")<br />
+                                                    <strong>Công ty:</strong> @(item.DoanhNghiep?.TenDoanhNghiep ?? item.TenCtyNgoai)
+                                                </div>
+
+                                                <label class="form-label fw-semibold small">Lý do từ chối (Sinh viên sẽ nhận được lý do này): *</label>
+                                                <textarea name="lyDo" class="form-control" rows="3" required 
+                                                          placeholder="Ví dụ: Giảng viên hiện đã nhận kín nhóm đề tài cùng hướng nghiên cứu; hoặc đề tài chưa phù hợp chuyên môn bộ môn..."></textarea>
+                                                <div class="form-text small text-muted">
+                                                    Sau khi bạn từ chối, sinh viên sẽ thấy lý do này và được quyền chọn giảng viên hướng dẫn khác.
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Hủy</button>
+                                                <button type="submit" class="btn btn-danger btn-sm">Xác Nhận Từ Chối</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Lịch sử các yêu cầu đã từ chối nếu có -->
+@if (yeuCauTuChoi.Any())
+{
+    <div class="card overflow-hidden">
+        <div class="card-header bg-light py-2">
+            <h6 class="fw-bold mb-0 text-muted">
+                <i class="bi bi-clock-history me-1"></i> Các Yêu Cầu Đã Từ Chối Trước Đây (@yeuCauTuChoi.Count)
+            </h6>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle mb-0 small">
+                <thead class="table-light">
+                    <tr>
+                        <th>MSSV</th>
+                        <th>Họ và Tên</th>
+                        <th>Lớp</th>
+                        <th>Lý do từ chối</th>
+                        <th>Thời gian</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var tc in yeuCauTuChoi)
+                    {
+                        <tr>
+                            <td class="text-muted">@tc.SinhVien?.Mssv</td>
+                            <td>@tc.SinhVien?.Hovaten</td>
+                            <td>@tc.SinhVien?.Lop</td>
+                            <td class="text-danger">@tc.LyDoTuChoi</td>
+                            <td class="text-muted">@tc.UpdatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

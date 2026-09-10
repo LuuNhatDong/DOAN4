@@ -1,0 +1,138 @@
+@model QuanLyThucTap.Models.DeCuongThucTap
+@{
+    ViewData["Title"] = "Đề cương & Kế hoạch thực tập";
+    var pc = ViewBag.PhanCong as QuanLyThucTap.Models.PhanCongHuongDan;
+    var sv = ViewBag.SinhVien as QuanLyThucTap.Models.SinhVien;
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card p-4 shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h4 class="fw-bold mb-1">
+                        <i class="bi bi-file-earmark-text text-primary me-2"></i>
+                        Đề Cương & Kế Hoạch Thực Tập Doanh Nghiệp
+                    </h4>
+                    <p class="text-muted small mb-0">Khoa Công nghệ Thông tin - Trường Đại học Kỹ thuật - Công nghệ Cần Thơ</p>
+                </div>
+                @switch (Model.TrangThai)
+                {
+                    case "da_duyet":
+                        <span class="badge bg-success px-3 py-2 fs-7 rounded-pill">
+                            <i class="bi bi-check-circle-fill me-1"></i> Đã được GVHD phê duyệt
+                        </span>
+                        break;
+                    case "yeu_cau_chinh_sua":
+                        <span class="badge bg-danger px-3 py-2 fs-7 rounded-pill">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i> Yêu cầu chỉnh sửa lại
+                        </span>
+                        break;
+                    default:
+                        <span class="badge bg-warning text-dark px-3 py-2 fs-7 rounded-pill">
+                            <i class="bi bi-clock-history me-1"></i> Chờ GVHD phê duyệt
+                        </span>
+                        break;
+                }
+            </div>
+
+            <!-- Khối thông tin Giảng viên hướng dẫn -->
+            <div class="alert alert-light border p-3 mb-4 rounded-3">
+                <div class="row g-2 small">
+                    <div class="col-md-6">
+                        <strong>Sinh viên:</strong> @sv?.Hovaten (@sv?.Mssv) - Lớp: @sv?.Lop
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Chuyên ngành:</strong> @sv?.ChuyenNganh
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Giảng viên hướng dẫn:</strong> 
+                        <span class="text-primary fw-bold">@(pc?.GiangVien?.Hovaten ?? "Chưa phân công")</span>
+                        <span class="text-muted">(@(pc?.GiangVien?.HocVi ?? ""))</span>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Đơn vị thực tập:</strong> @(pc?.DoanhNghiep?.TenDoanhNghiep ?? pc?.TenCtyNgoai ?? "Chưa khai báo")
+                    </div>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.NhanXetGvhd))
+            {
+                <div class="alert @(Model.TrangThai == "da_duyet" ? "alert-success" : "alert-danger") py-3 mb-4 rounded-3">
+                    <div class="fw-bold mb-1">
+                        <i class="bi bi-chat-dots-fill me-2"></i>Lời phê & Đánh giá từ GVHD (@pc?.GiangVien?.Hovaten):
+                    </div>
+                    <div>@Model.NhanXetGvhd</div>
+                </div>
+            }
+
+            <form asp-action="Save" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="PhanCongId" />
+
+                <!-- Phần 1: Tên đề tài & Mục tiêu -->
+                <div class="card bg-light border-0 p-3 mb-3">
+                    <h6 class="fw-bold text-primary mb-3">1. Thông Tin Đề Tài & Mục Tiêu Chuyên Môn</h6>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Tên đề tài / Hướng thực tập tại doanh nghiệp *</label>
+                        <input asp-for="TenDeTai" class="form-control" 
+                               placeholder="Ví dụ: Xây dựng hệ thống thông tin quản lý chuỗi cung ứng logistics tại công ty..." required 
+                               disabled="@(Model.TrangThai == "da_duyet" ? "disabled" : null)" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Mục tiêu chuyên môn & Kỹ năng cần đạt *</label>
+                        <textarea asp-for="MucTieu" class="form-control" rows="3" 
+                                  placeholder="Nắm vững quy trình nghiệp vụ thực tế, tiếp thu công nghệ mới của doanh nghiệp, trau dồi kỹ năng mềm và làm việc nhóm..." required
+                                  disabled="@(Model.TrangThai == "da_duyet" ? "disabled" : null)"></textarea>
+                    </div>
+                </div>
+
+                <!-- Phần 2: Sản phẩm & Công nghệ -->
+                <div class="card bg-light border-0 p-3 mb-3">
+                    <h6 class="fw-bold text-primary mb-3">2. Sản Phẩm Bàn Giao & Công Nghệ Ứng Dụng</h6>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Sản phẩm / Kết quả bàn giao dự kiến cho doanh nghiệp *</label>
+                        <textarea asp-for="KetQuaDuKien" class="form-control" rows="3" 
+                                  placeholder="Module phần mềm hoàn chỉnh, báo cáo phân tích thiết kế hệ thống, tài liệu kiểm thử và mã nguồn..." required
+                                  disabled="@(Model.TrangThai == "da_duyet" ? "disabled" : null)"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Công nghệ / Công cụ kỹ thuật sử dụng *</label>
+                        <input asp-for="CongNgheSuDung" class="form-control" 
+                               placeholder="Ví dụ: C#, ASP.NET Core MVC, PostgreSQL, Bootstrap 5, Docker, Git, RESTful API..." required 
+                               disabled="@(Model.TrangThai == "da_duyet" ? "disabled" : null)" />
+                    </div>
+                </div>
+
+                <!-- Phần 3: Kế hoạch thực hiện theo 4 giai đoạn -->
+                <div class="card bg-light border-0 p-3 mb-4">
+                    <h6 class="fw-bold text-primary mb-2">3. Kế Hoạch Thực Hiện 4 Giai Đoạn Chuẩn</h6>
+                    <p class="text-muted small mb-3">Phân chia lộ trình thực tập rõ ràng qua các mốc thời gian</p>
+
+                    <textarea asp-for="NoiDungKeHoach" class="form-control small font-monospace" rows="6" 
+                              placeholder="- Giai đoạn 1: Tiếp nhận vị trí, tìm hiểu quy trình nghiệp vụ doanh nghiệp và công nghệ áp dụng.&#10;- Giai đoạn 2: Thu thập yêu cầu, phân tích và thiết kế cơ sở dữ liệu/kiến trúc module.&#10;- Giai đoạn 3: Hiện thực hóa tính năng, lập trình, kiểm thử và sửa lỗi với Mentor.&#10;- Giai đoạn 4: Nghiệm thu bàn giao sản phẩm, hoàn thiện báo cáo thực tập tốt nghiệp."
+                              disabled="@(Model.TrangThai == "da_duyet" ? "disabled" : null)"></textarea>
+                </div>
+
+                @if (Model.TrangThai != "da_duyet")
+                {
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                            <i class="bi bi-send-check me-1"></i> Gửi Đề Cương Cho GVHD Phê Duyệt
+                        </button>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-success text-center py-2.5 small mb-0">
+                        <i class="bi bi-shield-check me-1"></i> Đề cương đã được phê duyệt chính thức. Kế hoạch đã được cố định cho toàn bộ đợt thực tập.
+                    </div>
+                }
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,464 @@
+@model QuanLyThucTap.Models.PhanCongHuongDan
+@{
+    ViewData["Title"] = "Chi tiết sinh viên & Chấm điểm";
+    var sv = Model.SinhVien;
+    var dc = Model.DeCuongThucTap;
+    var kq = Model.DanhGiaKetQua;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <a asp-action="Index" class="btn btn-sm btn-outline-secondary mb-2">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+        </a>
+        <h4 class="fw-bold mb-1">Sinh Viên: @sv?.Hovaten (@sv?.Mssv)</h4>
+        <p class="text-muted small mb-0">Lớp: @sv?.Lop - Chuyên ngành: @sv?.ChuyenNganh - GPA: @sv?.Gpa.ToString("0.00")</p>
+    </div>
+    <div>
+        @switch (Model.TrangThaiDuyet)
+        {
+            case "dang_thuc_tap":
+                <span class="badge bg-primary px-3 py-2 fs-7 rounded-pill">Đang thực tập</span>
+                break;
+            case "hoan_thanh":
+                <span class="badge bg-success px-3 py-2 fs-7 rounded-pill">Đã hoàn thành đợt thực tập</span>
+                break;
+            default:
+                <span class="badge bg-warning text-dark px-3 py-2 fs-7 rounded-pill">@Model.TrangThaiDuyet</span>
+                break;
+        }
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Cột trái: Thông tin nơi thực tập & Cấu hình theo dõi -->
+    <div class="col-lg-5">
+        <!-- Card Đơn vị thực tập -->
+        <div class="card p-4 mb-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-building text-primary me-2"></i>Nơi Thực Tập</h5>
+            <ul class="list-unstyled mb-0 small">
+                <li class="mb-2"><strong>Công ty:</strong> @(Model.DoanhNghiep?.TenDoanhNghiep ?? Model.TenCtyNgoai ?? "Chưa có thông tin")</li>
+                <li class="mb-2"><strong>Vị trí thực tập:</strong> @(Model.ViTriThucTap ?? "Chưa khai báo")</li>
+                <li class="mb-0"><strong>Thời gian thực tập:</strong> <span class="badge bg-primary">@Model.SoThangThucTap tháng</span></li>
+            </ul>
+        </div>
+
+        <!-- Card Thiết lập chu kỳ theo dõi của GVHD -->
+        <div class="card p-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-sliders text-primary me-2"></i>Cấu Hình Chu Kỳ Theo Dõi</h5>
+            <p class="text-muted small">Tùy chọn quy định sinh viên nộp báo cáo định kỳ theo tuần hay tháng</p>
+
+            <form asp-action="CauHinhTheoDoi" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="phanCongId" value="@Model.Id" />
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Hình thức chu kỳ nộp nhật ký:</label>
+                    <select name="loaiChuKyBaoCao" class="form-select">
+                        <option value="theo_tuan" selected="@(Model.LoaiChuKyBaoCao == "theo_tuan" ? "selected" : null)">Nộp theo tuần (@(Model.SoThangThucTap * 4) tuần)</option>
+                        <option value="theo_thang" selected="@(Model.LoaiChuKyBaoCao == "theo_thang" ? "selected" : null)">Nộp theo tháng (@Model.SoThangThucTap tháng)</option>
+                    </select>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" name="yeuCauBaoCaoGiuaKy" value="true" class="form-check-input" id="checkGiuaKy" 
+                           @(Model.YeuCauBaoCaoGiuaKy ? "checked" : "") />
+                    <label class="form-check-label small fw-semibold" for="checkGiuaKy">
+                        Yêu cầu nộp Báo cáo Giữa kỳ (Nếu tắt, SV chỉ cần nộp báo cáo cuối kỳ)
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-sm btn-primary w-100">
+                    <i class="bi bi-save me-1"></i> Lưu Thiết Lập
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Cột phải: Đề cương thực tập & Phê duyệt -->
+    <div class="col-lg-7">
+        <div class="card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0"><i class="bi bi-file-earmark-text text-primary me-2"></i>Kế Hoạch & Đề Cương Thực Tập</h5>
+                @if (dc != null)
+                {
+                    @switch (dc.TrangThai)
+                    {
+                        case "da_duyet":
+                            <span class="badge bg-success">Đã phê duyệt</span>
+                            break;
+                        case "yeu_cau_chinh_sua":
+                            <span class="badge bg-danger">Yêu cầu chỉnh sửa</span>
+                            break;
+                        default:
+                            <span class="badge bg-warning text-dark">Chờ phê duyệt</span>
+                            break;
+                    }
+                }
+            </div>
+
+            @if (dc == null)
+            {
+                <div class="alert alert-light text-center py-4 text-muted">
+                    <i class="bi bi-hourglass-split fs-2 d-block mb-2"></i>
+                    Sinh viên chưa soạn thảo và nộp đề cương thực tập.
+                </div>
+            }
+            else
+            {
+                <div class="mb-3">
+                    <strong class="small text-muted d-block">Tên đề tài / Hướng nghiên cứu:</strong>
+                    <div class="fs-6 fw-bold text-primary">@dc.TenDeTai</div>
+                </div>
+
+                <div class="mb-3">
+                    <strong class="small text-muted d-block">Mục tiêu chuyên môn:</strong>
+                    <p class="small mb-0">@dc.MucTieu</p>
+                </div>
+
+                <div class="mb-3">
+                    <strong class="small text-muted d-block">Sản phẩm / Kết quả dự kiến bàn giao:</strong>
+                    <p class="small mb-0">@dc.KetQuaDuKien</p>
+                </div>
+
+                <div class="mb-3">
+                    <strong class="small text-muted d-block">Công nghệ sử dụng:</strong>
+                    <span class="badge bg-light text-dark border">@dc.CongNgheSuDung</span>
+                </div>
+
+                @if (!string.IsNullOrEmpty(dc.NhanXetGvhd))
+                {
+                    <div class="alert alert-info py-2 small mb-3">
+                        <strong>Lời phê của GVHD:</strong> @dc.NhanXetGvhd
+                    </div>
+                }
+
+                <!-- Form Duyệt / Yêu cầu sửa đề cương -->
+                <form asp-controller="DeCuong" asp-action="Duyet" method="post" class="border-top pt-3 mt-auto">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="deCuongId" value="@dc.Id" />
+
+                    <div class="mb-2">
+                        <label class="form-label small fw-semibold">Nhận xét của Giảng viên:</label>
+                        <input type="text" name="nhanXetGvhd" class="form-control form-control-sm" 
+                               value="@dc.NhanXetGvhd" placeholder="Nhập lời phê duyệt hoặc lưu ý chỉnh sửa..." />
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" name="trangThai" value="da_duyet" class="btn btn-sm btn-success flex-grow-1">
+                            <i class="bi bi-check-circle me-1"></i> Phê Duyệt Đề Cương
+                        </button>
+                        <button type="submit" name="trangThai" value="yeu_cau_chinh_sua" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-pencil me-1"></i> Yêu Cầu Sửa
+                        </button>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Phần 2: Lưới Thẻ Theo Dõi Tiến Độ Thực Tập Định Kỳ (Tuần / Tháng) -->
+<div class="card mb-4 overflow-hidden">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        @{
+            bool isThang = Model.LoaiChuKyBaoCao == "theo_thang";
+            int soThang = Model.SoThangThucTap > 0 ? Model.SoThangThucTap : 3;
+            int soKy = isThang ? soThang : soThang * 4;
+            string tenKy = isThang ? "Tháng" : "Tuần";
+        }
+        <div>
+            <h5 class="fw-bold mb-0">
+                <i class="bi bi-calendar3-week text-primary me-2"></i>
+                Theo Dõi Báo Cáo Định Kỳ: @(isThang ? $"{soThang} THÁNG THỰC TẬP ({soKy} KỲ THÁNG)" : $"{soThang} THÁNG THỰC TẬP ({soKy} TUẦN)")
+            </h5>
+            <small class="text-muted">Trực quan hóa trạng thái từng kỳ nộp theo thời gian thực tập của sinh viên</small>
+        </div>
+        <div>
+            <span class="badge bg-light text-dark border">
+                Đã nộp: @Model.DanhSachBaoCaoDinhKy.Count / @soKy kỳ
+            </span>
+        </div>
+    </div>
+    <div class="card-body bg-light bg-opacity-50 p-4">
+        <div class="row g-3">
+            @for (int i = 1; i <= soKy; i++)
+            {
+                var bc = Model.DanhSachBaoCaoDinhKy.FirstOrDefault(b => b.KyThu == i);
+                <div class="@(isThang ? "col-md-4" : "col-md-3 col-sm-6")">
+                    <div class="card h-100 shadow-sm border-0 @(bc != null ? (bc.TrangThai == "da_cham" ? "border-top border-4 border-success" : "border-top border-4 border-warning") : "border-top border-4 border-secondary")">
+                        <div class="card-body p-3 d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="fw-bold mb-0 text-dark">
+                                    <i class="bi @(isThang ? "bi-calendar-month" : "bi-calendar-week") text-primary me-1"></i>
+                                    @tenKy @i
+                                </h6>
+                                @if (bc == null)
+                                {
+                                    <span class="badge bg-secondary bg-opacity-25 text-secondary border px-2 py-1 fs-8">Chưa báo cáo</span>
+                                }
+                                else if (bc.TrangThai == "da_cham")
+                                {
+                                    <span class="badge bg-success px-2 py-1 fs-8"><i class="bi bi-check-circle me-1"></i>Đã chấm</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark px-2 py-1 fs-8"><i class="bi bi-clock me-1"></i>Chờ chấm</span>
+                                }
+                            </div>
+
+                            @if (bc != null)
+                            {
+                                <div class="small text-muted mb-2">
+                                    <i class="bi bi-calendar-range me-1"></i>@bc.NgayBatDau.ToString("dd/MM") - @bc.NgayKetThuc.ToString("dd/MM/yyyy")
+                                    <span class="d-block mt-0.5"><i class="bi bi-clock-history me-1"></i>Số ngày: @bc.SoNgayLamViec ngày</span>
+                                </div>
+
+                                <div class="mb-3 flex-grow-1">
+                                    <div class="small fw-semibold text-dark mb-1">Công việc đã làm:</div>
+                                    <p class="small text-muted mb-0 text-truncate-2" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                        @bc.CongViecHoanThanh
+                                    </p>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center pt-2 border-top mt-auto">
+                                    <div>
+                                        @if (bc.DiemSo.HasValue)
+                                        {
+                                            <span class="fs-5 fw-bold text-success">@bc.DiemSo.Value.ToString("0.0")</span>
+                                            <small class="text-muted">/10</small>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-warning fw-semibold small">Chưa có điểm</span>
+                                        }
+                                    </div>
+                                    <button type="button" class="btn btn-sm @(bc.TrangThai == "da_cham" ? "btn-outline-primary" : "btn-warning")" 
+                                            data-bs-toggle="modal" data-bs-target="#modalChamDiemDinhKy_@bc.Id">
+                                        <i class="bi bi-pencil-square me-1"></i>@(bc.TrangThai == "da_cham" ? "Sửa điểm" : "Chấm điểm")
+                                    </button>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="my-auto py-3 text-center text-muted">
+                                    <i class="bi bi-dash-circle fs-3 text-secondary opacity-50 d-block mb-1"></i>
+                                    <span class="small">Sinh viên chưa gửi báo cáo cho @tenKy.ToLower() này</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                @if (bc != null)
+                {
+                    <!-- Modal Chấm Điểm Nhật Ký -->
+                    <div class="modal fade" id="modalChamDiemDinhKy_@bc.Id" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form asp-controller="BaoCao" asp-action="ChamDiemDinhKy" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@bc.Id" />
+
+                                    <div class="modal-header">
+                                        <h5 class="modal-title fw-bold">Chấm Điểm Báo Cáo @tenKy @bc.KyThu</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="alert alert-light border small mb-3">
+                                            <strong>Thời gian:</strong> @bc.NgayBatDau.ToString("dd/MM/yyyy") đến @bc.NgayKetThuc.ToString("dd/MM/yyyy") (@bc.SoNgayLamViec ngày làm việc)<br />
+                                            <strong>Công việc đã làm:</strong> @bc.CongViecHoanThanh<br />
+                                            <strong>Kiến thức mới:</strong> @bc.KienThucHocDuoc
+                                            @if (!string.IsNullOrEmpty(bc.KhoKhanVuongMac))
+                                            {
+                                                <br /><strong>Khó khăn:</strong> @bc.KhoKhanVuongMac
+                                            }
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold small">Điểm số (Thang điểm 10) *</label>
+                                            <input type="number" step="0.1" min="0" max="10" name="diemSo" class="form-control fs-5 fw-bold text-primary" 
+                                                   value="@(bc.DiemSo ?? 9.0m)" required />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold small">Nhận xét chi tiết từ Giảng viên hướng dẫn:</label>
+                                            <textarea name="nhanXetGvhd" class="form-control" rows="3" placeholder="Nhận xét tiến độ, thái độ và kỹ năng...">@bc.NhanXetGvhd</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold small">Nhận xét từ phía doanh nghiệp (nếu có):</label>
+                                            <textarea name="nhanXetMentor" class="form-control" rows="2">@bc.NhanXetMentor</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
+                                        <button type="submit" class="btn btn-primary btn-sm">Lưu Điểm Chấm</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Phần 3: Báo cáo Tổng kết (Giữa kỳ & Cuối kỳ) -->
+<div class="card mb-4 overflow-hidden">
+    <div class="card-header bg-white py-3">
+        <h5 class="fw-bold mb-0"><i class="bi bi-file-earmark-pdf text-primary me-2"></i>Báo Cáo Tổng Kết (Giữa kỳ & Cuối kỳ)</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Loại</th>
+                    <th>Tiêu đề báo cáo</th>
+                    <th>Tóm tắt kết quả</th>
+                    <th>Tài liệu PDF & Source Code</th>
+                    <th>Điểm</th>
+                    <th>Nhận xét GVHD</th>
+                    <th class="text-end">Chấm điểm</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.DanhSachBaoCaoTongKet.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">Chưa có báo cáo tổng kết nào được nộp.</td>
+                    </tr>
+                }
+                @foreach (var tk in Model.DanhSachBaoCaoTongKet)
+                {
+                    <tr>
+                        <td>
+                            <span class="badge @(tk.LoaiBaoCao == "giua_ky" ? "bg-info" : "bg-primary")">
+                                @(tk.LoaiBaoCao == "giua_ky" ? "Giữa kỳ" : "Cuối kỳ")
+                            </span>
+                        </td>
+                        <td class="fw-bold">@tk.TieuDe</td>
+                        <td class="small" style="max-width: 250px;">@tk.TomTat</td>
+                        <td>
+                            <a href="@tk.FileBaoCaoUrl" target="_blank" class="btn btn-sm btn-outline-danger me-1">
+                                <i class="bi bi-file-earmark-pdf"></i> Xem PDF
+                            </a>
+                            @if (!string.IsNullOrEmpty(tk.LinkGithub))
+                            {
+                                <a href="@tk.LinkGithub" target="_blank" class="btn btn-sm btn-outline-dark">
+                                    <i class="bi bi-github"></i> GitHub
+                                </a>
+                            }
+                        </td>
+                        <td class="fw-bold fs-6 text-primary">
+                            @(tk.DiemSo.HasValue ? tk.DiemSo.Value.ToString("0.0") : "---")
+                        </td>
+                        <td class="small text-muted">@(tk.NhanXetGvhd ?? "Chưa có nhận xét")</td>
+                        <td class="text-end">
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalChamDiemTongKet_@tk.Id">
+                                <i class="bi bi-pencil me-1"></i> Chấm
+                            </button>
+                        </td>
+                    </tr>
+
+                    <!-- Modal Chấm Báo Cáo Tổng Kết -->
+                    <div class="modal fade" id="modalChamDiemTongKet_@tk.Id" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form asp-controller="BaoCao" asp-action="ChamDiemTongKet" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@tk.Id" />
+
+                                    <div class="modal-header">
+                                        <h5 class="modal-title fw-bold">Chấm Báo Cáo @(tk.LoaiBaoCao == "giua_ky" ? "Giữa kỳ" : "Cuối kỳ")</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold small">Điểm số (Thang điểm 10) *</label>
+                                            <input type="number" step="0.1" min="0" max="10" name="diemSo" class="form-control" 
+                                                   value="@(tk.DiemSo ?? 9.0m)" required />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold small">Nhận xét của Giảng viên:</label>
+                                            <textarea name="nhanXetGvhd" class="form-control" rows="3" placeholder="Đánh giá mức độ hoàn thành...">@tk.NhanXetGvhd</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
+                                        <button type="submit" class="btn btn-primary btn-sm">Lưu Điểm</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Phần 4: Bảng Điểm Tổng Kết (Khóa điểm tốt nghiệp) -->
+<div class="card p-4 border-primary">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h5 class="fw-bold mb-1 text-primary"><i class="bi bi-award-fill me-2"></i>Bảng Điểm Tổng Kết Thực Tập</h5>
+            <p class="text-muted small mb-0">Công thức tính: <strong>20% Báo cáo định kỳ + 20% Giữa kỳ + 30% Cuối kỳ + 30% Doanh nghiệp</strong></p>
+        </div>
+        @if (kq != null)
+        {
+            <div class="text-end">
+                <span class="fs-4 fw-bold text-primary">@kq.DiemTongKetHe10.ToString("0.00")</span>
+                <span class="badge @(kq.KetQua == "DAT" ? "bg-success" : "bg-danger") ms-2 fs-6">
+                    @kq.DiemChu (@(kq.KetQua == "DAT" ? "ĐẠT" : "KHÔNG ĐẠT"))
+                </span>
+            </div>
+        }
+    </div>
+
+    <form asp-controller="DanhGia" asp-action="ChotDiem" method="post" class="row g-3">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="phanCongId" value="@Model.Id" />
+
+        <div class="col-md-3">
+            <label class="form-label small fw-semibold">1. Điểm định kỳ (20%) *</label>
+            <input type="number" step="0.1" min="0" max="10" name="diemDinhKy" class="form-control" 
+                   value="@(kq?.DiemDinhKy ?? 9.5m)" required />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label small fw-semibold">2. Điểm giữa kỳ (20%) *</label>
+            <input type="number" step="0.1" min="0" max="10" name="diemGiuaKy" class="form-control" 
+                   value="@(kq?.DiemGiuaKy ?? 9.0m)" required />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label small fw-semibold">3. Điểm cuối kỳ (30%) *</label>
+            <input type="number" step="0.1" min="0" max="10" name="diemCuoiKy" class="form-control" 
+                   value="@(kq?.DiemCuoiKy ?? 9.5m)" required />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label small fw-semibold">4. Doanh nghiệp đánh giá (30%) *</label>
+            <input type="number" step="0.1" min="0" max="10" name="diemDoanhNghiep" class="form-control" 
+                   value="@(kq?.DiemDoanhNghiep ?? 9.5m)" required />
+        </div>
+
+        <div class="col-md-8">
+            <label class="form-label small fw-semibold">Nhận xét tổng kết của Giảng viên hướng dẫn:</label>
+            <input type="text" name="nhanXetTongKet" class="form-control" 
+                   value="@kq?.NhanXetTongKet" placeholder="Nhận xét năng lực, phẩm chất và khả năng đáp ứng công việc..." />
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label small fw-semibold">Ngày chốt điểm:</label>
+            <input type="date" name="ngayChotDiem" class="form-control" 
+                   value="@(kq?.NgayChotDiem.ToString("yyyy-MM-dd") ?? DateTime.Now.ToString("yyyy-MM-dd"))" required />
+        </div>
+
+        <div class="col-12 text-end mt-3">
+            <button type="submit" class="btn btn-primary px-4 fw-semibold shadow-sm">
+                <i class="bi bi-lock-fill me-1"></i> Chốt Điểm & Khóa Học Kỳ Thực Tập
+            </button>
+        </div>
+    </form>
+</div>

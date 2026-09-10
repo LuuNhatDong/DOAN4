@@ -1,0 +1,160 @@
+@{
+    ViewData["Title"] = "Dashboard Quản trị";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">Dashboard Quản Trị Khoa</h4>
+        <p class="text-muted small mb-0">Theo dõi tiến độ và số liệu tổng hợp đợt thực tập tốt nghiệp</p>
+    </div>
+    @if (ViewBag.DotHienTai != null)
+    {
+        <span class="badge bg-primary px-3 py-2 fs-7 rounded-pill">
+            <i class="bi bi-calendar-check me-1"></i> @ViewBag.DotHienTai.TenDot (@ViewBag.DotHienTai.NamHoc)
+        </span>
+    }
+</div>
+
+<!-- Phân bố Sinh viên theo 4 Ngành Đào tạo của Khoa CNTT -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card p-3 h-100 border-start border-4 border-primary shadow-sm">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted small fw-semibold">Hệ Thống Thông Tin</div>
+                    <h3 class="fw-bold mb-0 text-primary">@ViewBag.SvHttt <span class="fs-6 text-muted fw-normal">SV</span></h3>
+                </div>
+                <div class="p-2.5 bg-primary bg-opacity-10 text-primary rounded-3 fs-4">
+                    <i class="bi bi-diagram-3"></i>
+                </div>
+            </div>
+            <small class="text-muted mt-2 d-block">15 SV Lớp HTTT2311</small>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card p-3 h-100 border-start border-4 border-info shadow-sm">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted small fw-semibold">Công Nghệ Thông Tin</div>
+                    <h3 class="fw-bold mb-0 text-info">@ViewBag.SvCntt <span class="fs-6 text-muted fw-normal">SV</span></h3>
+                </div>
+                <div class="p-2.5 bg-info bg-opacity-10 text-info rounded-3 fs-4">
+                    <i class="bi bi-laptop"></i>
+                </div>
+            </div>
+            <small class="text-muted mt-2 d-block">14 SV Lớp CNTT2311</small>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card p-3 h-100 border-start border-4 border-warning shadow-sm">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted small fw-semibold">Khoa Học Máy Tính</div>
+                    <h3 class="fw-bold mb-0 text-warning">@ViewBag.SvKhmt <span class="fs-6 text-muted fw-normal">SV</span></h3>
+                </div>
+                <div class="p-2.5 bg-warning bg-opacity-10 text-warning rounded-3 fs-4">
+                    <i class="bi bi-cpu"></i>
+                </div>
+            </div>
+            <small class="text-muted mt-2 d-block">14 SV Lớp KHMT2311</small>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card p-3 h-100 border-start border-4 border-success shadow-sm">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted small fw-semibold">Kỹ Thuật Phần Mềm</div>
+                    <h3 class="fw-bold mb-0 text-success">@ViewBag.SvKtpm <span class="fs-6 text-muted fw-normal">SV</span></h3>
+                </div>
+                <div class="p-2.5 bg-success bg-opacity-10 text-success rounded-3 fs-4">
+                    <i class="bi bi-code-slash"></i>
+                </div>
+            </div>
+            <small class="text-muted mt-2 d-block">14 SV Lớp KTPM2311</small>
+        </div>
+    </div>
+</div>
+
+<!-- Tiến độ phân công & Giảng viên của Đợt đang chọn -->
+<div class="card p-3 mb-4 bg-light border">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="fw-bold text-dark">
+            <i class="bi bi-check2-all text-success me-1"></i> Tỷ lệ Sinh viên có GVHD hướng dẫn:
+        </span>
+        <span class="badge bg-primary fs-7">
+            @ViewBag.DaPhanCongGVHD / @ViewBag.TongPhanCongDot Sinh viên
+        </span>
+    </div>
+    @{
+        int pct = ViewBag.TongPhanCongDot > 0 ? (int)((double)ViewBag.DaPhanCongGVHD / ViewBag.TongPhanCongDot * 100) : 0;
+    }
+    <div class="progress" style="height: 10px;">
+        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" style="width: @pct%;"></div>
+    </div>
+</div>
+
+<!-- Biểu đồ & Top Doanh nghiệp -->
+<div class="row g-4 mb-4">
+    <!-- Biểu đồ trạng thái -->
+    <div class="col-lg-7">
+        <div class="card p-4 h-100">
+            <h5 class="fw-bold mb-3"><i class="bi bi-pie-chart-fill text-primary me-2"></i>Phân bố Trạng thái Thực tập</h5>
+            <div style="max-height: 280px;" class="d-flex justify-content-center">
+                <canvas id="chartTrangThai"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Doanh nghiệp tiếp nhận -->
+    <div class="col-lg-5">
+        <div class="card p-4 h-100">
+            <h5 class="fw-bold mb-3"><i class="bi bi-trophy-fill text-warning me-2"></i>Top Doanh Nghiệp Tiếp Nhận</h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Doanh nghiệp</th>
+                            <th class="text-end">Số lượng SV</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.TopDoanhNghiep != null)
+                        {
+                            foreach (var item in ViewBag.TopDoanhNghiep)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@item.Ten</td>
+                                    <td class="text-end"><span class="badge bg-light text-dark border px-2.5 py-1">@item.SoLuong SV</span></td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const ctx = document.getElementById('chartTrangThai').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Chờ duyệt', 'Đang thực tập', 'Hoàn thành', 'Từ chối'],
+                datasets: [{
+                    data: [@ViewBag.ChoDuyet, @ViewBag.DangThucTap, @ViewBag.HoanThanh, @ViewBag.TuChoi],
+                    backgroundColor: ['#f59e0b', '#3b82f6', '#10b981', '#ef4444'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    </script>
+}

@@ -1,0 +1,136 @@
+@model QuanLyThucTap.Models.DotThucTap
+@{
+    ViewData["Title"] = "Chi tiết đợt thực tập - " + Model.TenDot;
+    var phanCongs = Model.DanhSachPhanCong.Where(p => p.SinhVien != null && p.SinhVien.TrangThai == "hoat_dong").ToList();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <a asp-action="Index" class="btn btn-sm btn-outline-secondary mb-2">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách đợt
+        </a>
+        <h4 class="fw-bold mb-1">
+            <i class="bi bi-calendar3-range text-primary me-2"></i>@Model.TenDot
+            @if (Model.TrangThaiKichHoat)
+            {
+                <span class="badge bg-success ms-2 fs-7 align-middle">Đang kích hoạt</span>
+            }
+        </h4>
+        <p class="text-muted small mb-0">Thời gian diễn ra: @Model.NgayBatDau.ToString("dd/MM/yyyy") đến @Model.NgayKetThuc.ToString("dd/MM/yyyy")</p>
+    </div>
+    <div class="d-flex gap-2">
+        <form asp-action="ChonKy" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="dotId" value="@Model.Id" />
+            <button type="submit" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-check2-circle me-1"></i> Đặt làm kỳ đang xem
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Thống kê nhanh của đợt -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card p-3 border-start border-4 border-primary">
+            <div class="text-muted small">Tổng sinh viên tham gia</div>
+            <div class="fs-4 fw-bold text-primary">@phanCongs.Count</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 border-start border-4 border-success">
+            <div class="text-muted small">Đang thực tập chính thức</div>
+            <div class="fs-4 fw-bold text-success">@phanCongs.Count(p => p.TrangThaiDuyet == "dang_thuc_tap")</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 border-start border-4 border-warning">
+            <div class="text-muted small">Chờ phê duyệt GVHD / DN</div>
+            <div class="fs-4 fw-bold text-warning">@phanCongs.Count(p => p.TrangThaiDuyet == "cho_duyet")</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 border-start border-4 border-info">
+            <div class="text-muted small">Đã hoàn thành đợt</div>
+            <div class="fs-4 fw-bold text-info">@phanCongs.Count(p => p.TrangThaiDuyet == "hoan_thanh")</div>
+        </div>
+    </div>
+</div>
+
+<!-- Danh sách sinh viên & Doanh nghiệp trong đợt này -->
+<div class="card overflow-hidden">
+    <div class="card-header bg-white py-3">
+        <h5 class="fw-bold mb-0">Danh Sách Sinh Viên & Doanh Nghiệp Trong Đợt Này</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>MSSV</th>
+                    <th>Họ và Tên</th>
+                    <th>Lớp - Ngành</th>
+                    <th>Nơi Thực Tập Doanh Nghiệp</th>
+                    <th>Vị trí</th>
+                    <th>GVHD Phụ trách</th>
+                    <th>Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!phanCongs.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">Chưa có sinh viên nào trong đợt thực tập này.</td>
+                    </tr>
+                }
+                @foreach (var pc in phanCongs)
+                {
+                    <tr>
+                        <td class="fw-bold text-primary">@pc.SinhVien?.Mssv</td>
+                        <td class="fw-semibold">@pc.SinhVien?.Hovaten</td>
+                        <td>
+                            <span class="badge bg-light text-dark border">@pc.SinhVien?.Lop</span>
+                            <small class="text-muted d-block">@pc.SinhVien?.ChuyenNganh</small>
+                        </td>
+                        <td>
+                            <strong class="text-dark">@(pc.DoanhNghiep?.TenDoanhNghiep ?? pc.TenCtyNgoai ?? "Chưa khai báo")</strong>
+                            @if (!string.IsNullOrEmpty(pc.MentorDoanhNghiep))
+                            {
+                                <small class="text-muted d-block"><i class="bi bi-person me-1"></i>Mentor: @pc.MentorDoanhNghiep</small>
+                            }
+                        </td>
+                        <td>@(pc.ViTriThucTap ?? "---")</td>
+                        <td>
+                            @if (pc.GiangVien != null)
+                            {
+                                <span class="badge bg-info bg-opacity-10 text-info border">
+                                    <i class="bi bi-person-check me-1"></i>@pc.GiangVien.Hovaten
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning bg-opacity-10 text-warning border">Chưa phân công</span>
+                            }
+                        </td>
+                        <td>
+                            @switch (pc.TrangThaiDuyet)
+                            {
+                                case "dang_thuc_tap":
+                                    <span class="badge bg-primary">Đang thực tập</span>
+                                    break;
+                                case "hoan_thanh":
+                                    <span class="badge bg-success">Hoàn thành</span>
+                                    break;
+                                case "cho_duyet":
+                                    <span class="badge bg-warning text-dark">Chờ duyệt</span>
+                                    break;
+                                default:
+                                    <span class="badge bg-secondary">@pc.TrangThaiDuyet</span>
+                                    break;
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

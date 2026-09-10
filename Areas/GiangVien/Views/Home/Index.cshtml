@@ -1,0 +1,145 @@
+@model IEnumerable<QuanLyThucTap.Models.PhanCongHuongDan>
+@{
+    ViewData["Title"] = "Dashboard Giảng viên";
+    var gv = ViewBag.GiangVien as QuanLyThucTap.Models.GiangVien;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">Chào mừng, @gv?.Hovaten</h4>
+        <p class="text-muted small mb-0">Học vị: @gv?.HocVi - Bộ môn: @gv?.BoMon</p>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-4">
+        <div class="card p-3 h-100">
+            <div class="d-flex align-items-center gap-3">
+                <div class="p-3 bg-primary bg-opacity-10 text-primary rounded-3 fs-3">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <div>
+                    <div class="text-muted small fw-semibold">Sinh Viên Đang Phụ Trách</div>
+                    <h3 class="fw-bold mb-0">@ViewBag.TongSinhVien</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="card p-3 h-100">
+            <div class="d-flex align-items-center gap-3">
+                <div class="p-3 bg-warning bg-opacity-10 text-warning rounded-3 fs-3">
+                    <i class="bi bi-file-earmark-text-fill"></i>
+                </div>
+                <div>
+                    <div class="text-muted small fw-semibold">Đề Cương Chờ Duyệt</div>
+                    <h3 class="fw-bold mb-0">@ViewBag.DeCuongChoDuyet</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="card p-3 h-100">
+            <div class="d-flex align-items-center gap-3">
+                <div class="p-3 bg-success bg-opacity-10 text-success rounded-3 fs-3">
+                    <i class="bi bi-award-fill"></i>
+                </div>
+                <div>
+                    <div class="text-muted small fw-semibold">Đã Chốt Điểm Hoàn Thành</div>
+                    <h3 class="fw-bold mb-0">@ViewBag.DaHoanThanh</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card overflow-hidden">
+    <div class="card-header bg-white py-3">
+        <h5 class="fw-bold mb-0"><i class="bi bi-list-task me-2 text-primary"></i>Danh Sách Sinh Viên Theo Dõi</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>MSSV</th>
+                    <th>Họ và Tên</th>
+                    <th>Lớp</th>
+                    <th>Nơi thực tập</th>
+                    <th>Chu kỳ nộp bài</th>
+                    <th>Đề cương</th>
+                    <th>Trạng thái</th>
+                    <th class="text-end">Chi tiết & Chấm điểm</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">Bạn chưa được phân công sinh viên nào.</td>
+                    </tr>
+                }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="fw-bold text-primary">@item.SinhVien?.Mssv</td>
+                        <td class="fw-semibold">@item.SinhVien?.Hovaten</td>
+                        <td><span class="badge bg-light text-dark border">@item.SinhVien?.Lop</span></td>
+                        <td>
+                            @if (item.DoanhNghiep != null)
+                            {
+                                <span>@item.DoanhNghiep.TenVietTat</span>
+                            }
+                            else
+                            {
+                                <span>@(item.TenCtyNgoai ?? "---")</span>
+                            }
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-secondary border">
+                                @(item.LoaiChuKyBaoCao == "theo_tuan" ? "Theo tuần" : "Theo tháng")
+                            </span>
+                        </td>
+                        <td>
+                            @if (item.DeCuongThucTap == null)
+                            {
+                                <span class="badge bg-secondary">Chưa nộp</span>
+                            }
+                            else if (item.DeCuongThucTap.TrangThai == "cho_duyet")
+                            {
+                                <span class="badge bg-warning text-dark">Chờ duyệt</span>
+                            }
+                            else if (item.DeCuongThucTap.TrangThai == "da_duyet")
+                            {
+                                <span class="badge bg-success">Đã duyệt</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Yêu cầu sửa</span>
+                            }
+                        </td>
+                        <td>
+                            @switch (item.TrangThaiDuyet)
+                            {
+                                case "dang_thuc_tap":
+                                    <span class="badge bg-primary">Đang thực tập</span>
+                                    break;
+                                case "hoan_thanh":
+                                    <span class="badge bg-success">Hoàn thành</span>
+                                    break;
+                                default:
+                                    <span class="badge bg-warning text-dark">@item.TrangThaiDuyet</span>
+                                    break;
+                            }
+                        </td>
+                        <td class="text-end">
+                            <a asp-controller="SinhVien" asp-action="Detail" asp-route-phanCongId="@item.Id" 
+                               class="btn btn-sm btn-primary">
+                                <i class="bi bi-box-arrow-up-right me-1"></i> Quản lý & Chấm điểm
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

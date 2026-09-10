@@ -1,0 +1,166 @@
+@model QuanLyThucTap.Models.PhanCongHuongDan
+@{
+    ViewData["Title"] = "Đăng ký nơi thực tập & Chọn GVHD";
+    var sv = ViewBag.SinhVien as QuanLyThucTap.Models.SinhVien;
+    var danhSachGv = ViewBag.DanhSachGiangVien as List<QuanLyThucTap.Models.GiangVien> ?? new List<QuanLyThucTap.Models.GiangVien>();
+    var dotId = (long)(ViewBag.DotId ?? 0);
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="card p-4 shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h4 class="fw-bold mb-1">
+                        <i class="bi bi-building-check text-primary me-2"></i>
+                        Khai Báo Nơi Thực Tập & Chọn Giảng Viên Hướng Dẫn
+                    </h4>
+                    <p class="text-muted small mb-0">Hệ thống thực tập doanh nghiệp - Khoa Công nghệ Thông tin (CTUET)</p>
+                </div>
+                @if (Model != null)
+                {
+                    @switch (Model.TrangThaiDuyet)
+                    {
+                        case "dang_thuc_tap":
+                            <span class="badge bg-success px-3 py-2 fs-7 rounded-pill">
+                                <i class="bi bi-check-circle-fill me-1"></i> GVHD đã tiếp nhận
+                            </span>
+                            break;
+                        case "cho_gv_duyet":
+                            <span class="badge bg-warning text-dark px-3 py-2 fs-7 rounded-pill">
+                                <i class="bi bi-hourglass-split me-1"></i> Chờ GVHD xác nhận
+                            </span>
+                            break;
+                        case "gv_tu_choi":
+                            <span class="badge bg-danger px-3 py-2 fs-7 rounded-pill">
+                                <i class="bi bi-x-circle me-1"></i> GVHD đã từ chối
+                            </span>
+                            break;
+                        case "hoan_thanh":
+                            <span class="badge bg-primary px-3 py-2 fs-7 rounded-pill">Đã hoàn thành</span>
+                            break;
+                        default:
+                            <span class="badge bg-secondary px-3 py-2 fs-7 rounded-pill">
+                                <i class="bi bi-file-earmark-plus me-1"></i> Chưa gửi yêu cầu
+                            </span>
+                            break;
+                    }
+                }
+            </div>
+
+            <!-- Khối thông tin sinh viên -->
+            <div class="alert alert-light border p-3 mb-4 rounded-3">
+                <div class="row g-2 small">
+                    <div class="col-md-6"><strong>Sinh viên:</strong> @sv?.Hovaten (@sv?.Mssv)</div>
+                    <div class="col-md-6"><strong>Lớp & Ngành:</strong> @sv?.Lop - @sv?.ChuyenNganh</div>
+                    <div class="col-md-6">
+                        <strong>GVHD phụ trách:</strong> 
+                        <span class="text-primary fw-bold">@(Model?.GiangVien?.Hovaten ?? "Chưa có GVHD")</span>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Đợt thực tập:</strong> @(Model?.DotThucTap?.TenDot ?? "Học kỳ hiện tại")
+                    </div>
+                </div>
+            </div>
+
+            @if (Model?.TrangThaiDuyet == "gv_tu_choi")
+            {
+                <div class="alert alert-danger border-start border-4 border-danger p-3 mb-4 shadow-sm">
+                    <div class="d-flex align-items-start">
+                        <i class="bi bi-x-circle-fill text-danger fs-3 me-3 mt-1"></i>
+                        <div>
+                            <h6 class="fw-bold mb-1">Yêu cầu hướng dẫn trước đó đã bị Giảng viên từ chối</h6>
+                            <p class="small mb-1">
+                                <strong>Giảng viên phản hồi:</strong> @(Model.GiangVien?.Hovaten ?? "GVHD") (@(Model.GiangVien?.HocVi ?? ""))<br />
+                                <strong>Lý do từ chối:</strong> <span class="text-danger fw-semibold">@(Model.LyDoTuChoi ?? "Giảng viên chưa nêu lý do chi tiết.")</span>
+                            </p>
+                            <p class="small text-muted mb-0">
+                                <i class="bi bi-info-circle me-1"></i> Bạn vui lòng chọn một Giảng viên khác có sẵn bên dưới và nhấn <strong>"Gửi Yêu Cầu Hướng Dẫn Mới"</strong>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (Model?.TrangThaiDuyet == "cho_gv_duyet")
+            {
+                <div class="alert alert-warning border-start border-4 border-warning p-3 mb-4 shadow-sm">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-hourglass-split text-warning fs-3 me-3"></i>
+                        <div>
+                            <h6 class="fw-bold mb-1">Yêu cầu đang chờ Giảng viên xác nhận</h6>
+                            <p class="small mb-0">
+                                Hệ thống đã chuyển yêu cầu hướng dẫn của bạn đến <strong>@(Model.GiangVien?.Hovaten ?? "GVHD")</strong>. Thầy/Cô sẽ xem xét tiếp nhận trong thời gian sớm nhất. Bạn vẫn có thể cập nhật lại thông tin hoặc đổi giảng viên khác nếu muốn.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <form asp-action="Save" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="phanCongId" value="@(Model?.Id ?? 0)" />
+
+                <!-- Phần 1: Doanh nghiệp thực tập -->
+                <div class="card bg-light border-0 p-3 mb-3">
+                    <h6 class="fw-bold text-primary mb-3">1. Thông Tin Nơi Thực Tập Doanh Nghiệp</h6>
+                    
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Tên doanh nghiệp / Công ty tiếp nhận thực tập *</label>
+                        <input type="text" name="tenCtyNgoai" class="form-control" 
+                               value="@(Model?.TenCtyNgoai ?? Model?.DoanhNghiep?.TenDoanhNghiep)" 
+                               placeholder="Ví dụ: Công ty Cổ phần Phần mềm FPT Cần Thơ, Tập đoàn Viettel..." required />
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Vị trí thực tập dự kiến *</label>
+                            <input type="text" name="viTriThucTap" class="form-control" 
+                                   value="@Model?.ViTriThucTap" 
+                                   placeholder="Ví dụ: Lập trình viên .NET, Frontend React, BA, QA..." required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Thời gian thực tập dự kiến *</label>
+                            <select name="soThangThucTap" class="form-select" required>
+                                <option value="2" selected="@(Model?.SoThangThucTap == 2 ? "selected" : null)">2 tháng (Tương đương 2 kỳ tháng / 8 tuần)</option>
+                                <option value="3" selected="@(Model?.SoThangThucTap == 3 || Model?.SoThangThucTap == null ? "selected" : null)">3 tháng (Tương đương 3 kỳ tháng / 12 tuần)</option>
+                                <option value="4" selected="@(Model?.SoThangThucTap == 4 ? "selected" : null)">4 tháng (Tương đương 4 kỳ tháng / 16 tuần)</option>
+                            </select>
+                            <div class="form-text small text-muted">Hệ thống sẽ tự động phân chia số kỳ nộp nhật ký định kỳ theo thời gian này.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phần 2: Chọn Giảng viên Hướng dẫn -->
+                <div class="card bg-light border-0 p-3 mb-4">
+                    <h6 class="fw-bold text-primary mb-2">2. Gửi Yêu Cầu Đến Giảng Viên Hướng Dẫn</h6>
+                    <p class="text-muted small mb-3">
+                        Chọn Giảng viên bạn mong muốn được hướng dẫn. Giảng viên sẽ nhận được thông báo để xem xét tiếp nhận bạn. Giảng viên đã đủ chỉ tiêu sinh viên sẽ không thể chọn.
+                    </p>
+
+                    <div class="mb-2">
+                        <label class="form-label small fw-semibold">Chọn Giảng viên Hướng dẫn: *</label>
+                        <select name="giangVienId" class="form-select form-select-lg fs-6" required>
+                            <option value="">-- Vui lòng chọn 1 giảng viên --</option>
+                            @foreach (var gv in danhSachGv)
+                            {
+                                int dangNhan = gv.DanhSachPhanCong.Count(p => (dotId == 0 || p.DotThucTapId == dotId) && p.TrangThaiDuyet != "tu_choi" && p.TrangThaiDuyet != "gv_tu_choi");
+                                bool daDay = dangNhan >= gv.SoLuongToiDa;
+                                <option value="@gv.Id" 
+                                        selected="@(Model?.GiangVienId == gv.Id ? "selected" : null)"
+                                        disabled="@(daDay && Model?.GiangVienId != gv.Id ? "disabled" : null)">
+                                    @gv.Hovaten (@gv.HocVi) - [@dangNhan/@gv.SoLuongToiDa SV] @(daDay ? "— (ĐÃ ĐỦ CHỈ TIÊU)" : "")
+                                </option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold shadow-sm">
+                        <i class="bi bi-send-fill me-1"></i> Gửi Yêu Cầu Hướng Dẫn & Lưu Thông Tin
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,127 @@
+@model IEnumerable<QuanLyThucTap.Models.PhanCongHuongDan>
+@{
+    ViewData["Title"] = "Phân công Giảng viên hướng dẫn";
+    var dotHienTai = ViewBag.DotHienTai as QuanLyThucTap.Models.DotThucTap;
+    var danhSachDot = ViewBag.DanhSachDot as List<QuanLyThucTap.Models.DotThucTap> ?? new();
+    var giangViens = ViewBag.GiangViens as List<QuanLyThucTap.Models.GiangVien> ?? new();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">Phân Công Giảng Viên Hướng Dẫn</h4>
+        <p class="text-muted small mb-0">Gán sinh viên cho giảng viên hướng dẫn theo đợt thực tập</p>
+    </div>
+
+    <!-- Chọn đợt thực tập -->
+    <form method="get" class="d-flex align-items-center gap-2">
+        <label class="small fw-semibold text-muted text-nowrap">Chọn đợt:</label>
+        <select name="dotId" class="form-select form-select-sm" onchange="this.form.submit()">
+            @foreach (var dot in danhSachDot)
+            {
+                <option value="@dot.Id" selected="@(dotHienTai?.Id == dot.Id ? "selected" : null)">
+                    @dot.TenDot @(dot.TrangThaiKichHoat ? "★" : "")
+                </option>
+            }
+        </select>
+    </form>
+</div>
+
+<div class="card overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>MSSV</th>
+                    <th>Sinh viên</th>
+                    <th>Lớp</th>
+                    <th>Công ty thực tập</th>
+                    <th>Vị trí</th>
+                    <th>GVHD Phụ trách</th>
+                    <th>Trạng thái duyệt</th>
+                    <th class="text-end">Thao tác gán GVHD</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">Chưa có sinh viên nào đăng ký trong đợt này.</td>
+                    </tr>
+                }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="fw-bold text-primary">@item.SinhVien?.Mssv</td>
+                        <td class="fw-semibold">@item.SinhVien?.Hovaten</td>
+                        <td><span class="badge bg-light text-dark border">@item.SinhVien?.Lop</span></td>
+                        <td>
+                            @if (item.DoanhNghiep != null)
+                            {
+                                <span class="fw-semibold">@item.DoanhNghiep.TenVietTat</span>
+                            }
+                            else if (!string.IsNullOrEmpty(item.TenCtyNgoai))
+                            {
+                                <span class="text-muted">@item.TenCtyNgoai</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">Chưa khai báo</span>
+                            }
+                        </td>
+                        <td><small>@(item.ViTriThucTap ?? "---")</small></td>
+                        <td>
+                            @if (item.GiangVien != null)
+                            {
+                                <span class="badge bg-success bg-opacity-10 text-success border">
+                                    <i class="bi bi-person-check me-1"></i>@item.GiangVien.Hovaten
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning bg-opacity-10 text-warning border">Chưa phân công</span>
+                            }
+                        </td>
+                        <td>
+                            @switch (item.TrangThaiDuyet)
+                            {
+                                case "cho_duyet":
+                                    <span class="badge bg-warning text-dark">Chờ duyệt</span>
+                                    break;
+                                case "da_duyet":
+                                    <span class="badge bg-info text-dark">Đã duyệt GVHD</span>
+                                    break;
+                                case "dang_thuc_tap":
+                                    <span class="badge bg-primary">Đang thực tập</span>
+                                    break;
+                                case "hoan_thanh":
+                                    <span class="badge bg-success">Hoàn thành</span>
+                                    break;
+                                default:
+                                    <span class="badge bg-secondary">@item.TrangThaiDuyet</span>
+                                    break;
+                            }
+                        </td>
+                        <td class="text-end">
+                            <form asp-action="GanGiangVien" method="post" class="d-inline-flex gap-1 align-items-center justify-content-end">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="phanCongId" value="@item.Id" />
+                                <select name="giangVienId" class="form-select form-select-sm" style="max-width: 180px;" required>
+                                    <option value="">-- Gán GVHD --</option>
+                                    @foreach (var gv in giangViens)
+                                    {
+                                        <option value="@gv.Id" selected="@(item.GiangVienId == gv.Id ? "selected" : null)">
+                                            @gv.Hovaten
+                                        </option>
+                                    }
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-primary text-nowrap">
+                                    <i class="bi bi-check-lg"></i> Gán
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

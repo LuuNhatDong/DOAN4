@@ -1,0 +1,149 @@
+@model IEnumerable<QuanLyThucTap.Models.BaoCaoTongKet>
+@{
+    ViewData["Title"] = "Báo cáo Tổng kết (Giữa kỳ & Cuối kỳ)";
+    var pc = ViewBag.PhanCong as QuanLyThucTap.Models.PhanCongHuongDan;
+    bool coYeuCauGiuaKy = pc?.YeuCauBaoCaoGiuaKy ?? true;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">Nộp Báo Cáo Tổng Kết (Giữa kỳ / Cuối kỳ)</h4>
+        <p class="text-muted small mb-0">Tải lên file báo cáo PDF và đính kèm mã nguồn dự án (GitHub)</p>
+    </div>
+    <button type="button" class="btn btn-primary d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#modalNopTongKet">
+        <i class="bi bi-upload"></i> Nộp Báo Cáo Mới
+    </button>
+</div>
+
+<!-- Modal Nộp Báo Cáo -->
+<div class="modal fade" id="modalNopTongKet" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form asp-action="SaveTongKet" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="phanCongId" value="@(pc?.Id ?? 0)" />
+
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Nộp Báo Cáo Tổng Kết</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Loại báo cáo *</label>
+                            <select name="loaiBaoCao" class="form-select" required>
+                                @if (coYeuCauGiuaKy)
+                                {
+                                    <option value="giua_ky">Báo cáo Giữa kỳ</option>
+                                }
+                                <option value="cuoi_ky">Báo cáo Cuối kỳ</option>
+                            </select>
+                            @if (!coYeuCauGiuaKy)
+                            {
+                                <small class="text-muted text-info d-block mt-1">
+                                    <i class="bi bi-info-circle me-1"></i> GVHD đã tắt yêu cầu nộp báo cáo giữa kỳ.
+                                </small>
+                            }
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Link mã nguồn GitHub dự án:</label>
+                            <input type="url" name="linkGithub" class="form-control" placeholder="https://github.com/..." />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label small fw-semibold">Tiêu đề báo cáo *</label>
+                            <input type="text" name="tieuDe" class="form-control" 
+                                   placeholder="Ví dụ: Báo cáo thực tập tốt nghiệp giai đoạn 1" required />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label small fw-semibold">Tóm tắt kết quả đạt được *</label>
+                            <textarea name="tomTat" class="form-control" rows="3" 
+                                      placeholder="Tóm lược khối lượng công việc, tính năng hoàn thiện..." required></textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Tải lên File PDF báo cáo:</label>
+                            <input type="file" name="fileBaoCao" accept=".pdf" class="form-control" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Hoặc dán URL file PDF (Supabase Storage / Drive):</label>
+                            <input type="url" name="fileBaoCaoUrl" class="form-control" 
+                                   placeholder="https://...pdf" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Tải Lên Báo Cáo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Danh sách báo cáo đã nộp -->
+<div class="card overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Loại</th>
+                    <th>Tiêu đề báo cáo</th>
+                    <th>Tóm tắt kết quả</th>
+                    <th>File PDF</th>
+                    <th>Link GitHub</th>
+                    <th>Điểm</th>
+                    <th>Nhận xét GVHD</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">Bạn chưa nộp bản báo cáo nào.</td>
+                    </tr>
+                }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <span class="badge @(item.LoaiBaoCao == "giua_ky" ? "bg-info" : "bg-primary")">
+                                @(item.LoaiBaoCao == "giua_ky" ? "Giữa kỳ" : "Cuối kỳ")
+                            </span>
+                        </td>
+                        <td class="fw-bold">@item.TieuDe</td>
+                        <td class="small" style="max-width: 250px;">@item.TomTat</td>
+                        <td>
+                            <a href="@item.FileBaoCaoUrl" target="_blank" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-file-earmark-pdf me-1"></i> Xem PDF
+                            </a>
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.LinkGithub))
+                            {
+                                <a href="@item.LinkGithub" target="_blank" class="btn btn-sm btn-outline-dark">
+                                    <i class="bi bi-github me-1"></i> GitHub
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">---</span>
+                            }
+                        </td>
+                        <td class="fw-bold fs-6 text-primary">
+                            @(item.DiemSo.HasValue ? item.DiemSo.Value.ToString("0.0") : "Chờ chấm")
+                        </td>
+                        <td class="small text-muted" style="max-width: 200px;">
+                            @(item.NhanXetGvhd ?? "---")
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

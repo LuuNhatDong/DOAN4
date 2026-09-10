@@ -1,0 +1,74 @@
+@model IEnumerable<QuanLyThucTap.Models.PhanCongHuongDan>
+@{
+    ViewData["Title"] = "Sinh viên phụ trách";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">Danh Sách Sinh Viên Phụ Trách</h4>
+        <p class="text-muted small mb-0">Theo dõi tiến độ, duyệt đề cương và chấm điểm từng sinh viên</p>
+    </div>
+</div>
+
+<div class="card overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>MSSV</th>
+                    <th>Họ và Tên</th>
+                    <th>Lớp</th>
+                    <th>Công ty thực tập</th>
+                    <th>Chu kỳ báo cáo</th>
+                    <th>Đề tài</th>
+                    <th>Trạng thái</th>
+                    <th class="text-end">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">Chưa có sinh viên nào trong danh sách.</td>
+                    </tr>
+                }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="fw-bold text-primary">@item.SinhVien?.Mssv</td>
+                        <td class="fw-semibold">@item.SinhVien?.Hovaten</td>
+                        <td><span class="badge bg-light text-dark border">@item.SinhVien?.Lop</span></td>
+                        <td>@(item.DoanhNghiep?.TenVietTat ?? item.TenCtyNgoai ?? "Chưa đăng ký")</td>
+                        <td>
+                            <span class="badge bg-light text-secondary border">
+                                @(item.LoaiChuKyBaoCao == "theo_tuan" ? "Theo tuần" : "Theo tháng")
+                            </span>
+                        </td>
+                        <td style="max-width: 250px;" class="small text-truncate">
+                            @(item.DeCuongThucTap?.TenDeTai ?? "Chưa có đề tài")
+                        </td>
+                        <td>
+                            @switch (item.TrangThaiDuyet)
+                            {
+                                case "dang_thuc_tap":
+                                    <span class="badge bg-primary">Đang thực tập</span>
+                                    break;
+                                case "hoan_thanh":
+                                    <span class="badge bg-success">Hoàn thành</span>
+                                    break;
+                                default:
+                                    <span class="badge bg-warning text-dark">@item.TrangThaiDuyet</span>
+                                    break;
+                            }
+                        </td>
+                        <td class="text-end">
+                            <a asp-action="Detail" asp-route-phanCongId="@item.Id" class="btn btn-sm btn-primary">
+                                <i class="bi bi-box-arrow-up-right me-1"></i> Quản lý & Chấm điểm
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

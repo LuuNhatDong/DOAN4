@@ -1,0 +1,287 @@
+@model IEnumerable<QuanLyThucTap.Models.SinhVien>
+@{
+    ViewData["Title"] = "Quản lý Sinh viên & Phân công GVHD";
+    var dotHienTai = ViewBag.DotHienTai as QuanLyThucTap.Models.DotThucTap;
+    var dotId = (long)(ViewBag.DotId ?? 0);
+    var danhSachGv = ViewBag.DanhSachGiangVien as List<QuanLyThucTap.Models.GiangVien> ?? new List<QuanLyThucTap.Models.GiangVien>();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">Quản Lý Sinh Viên Thực Tập & Phân Công GVHD</h4>
+        <p class="text-muted small mb-0">
+            Học kỳ đang theo dõi: <span class="badge bg-primary">@(dotHienTai?.TenDot ?? "Chưa chọn đợt")</span>
+            - Sinh viên mặc định đã có nơi thực tập, Khoa quản lý và phân công GVHD
+        </p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary d-flex align-items-center gap-1">
+        <i class="bi bi-person-plus-fill"></i> Thêm Sinh Viên Mới
+    </a>
+</div>
+
+<!-- Bộ lọc tìm kiếm & Phân loại ngành/lớp/GVHD -->
+<div class="card p-3 mb-4">
+    <form method="get" class="row g-2 align-items-center">
+        <div class="col-md-3">
+            <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                <input type="text" name="search" value="@ViewBag.Search" class="form-control" placeholder="MSSV, họ tên, email..." />
+            </div>
+        </div>
+        <div class="col-md-2">
+            <select name="chuyenNganh" class="form-select">
+                <option value="">-- Tất cả ngành --</option>
+                @if (ViewBag.DanhSachChuyenNganh != null)
+                {
+                    foreach (var cn in (List<string>)ViewBag.DanhSachChuyenNganh)
+                    {
+                        <option value="@cn" selected="@(ViewBag.ChuyenNganh == cn ? "selected" : null)">@cn</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select name="lop" class="form-select">
+                <option value="">-- Tất cả lớp --</option>
+                @if (ViewBag.DanhSachLop != null)
+                {
+                    foreach (var l in (List<string>)ViewBag.DanhSachLop)
+                    {
+                        <option value="@l" selected="@(ViewBag.Lop == l ? "selected" : null)">@l</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select name="trangThaiPhanCong" class="form-select">
+                <option value="">-- Tình trạng GVHD --</option>
+                <option value="da_phan_cong" selected="@(ViewBag.TrangThaiPhanCong == "da_phan_cong" ? "selected" : null)">Đã phân công GVHD</option>
+                <option value="cho_duyet" selected="@(ViewBag.TrangThaiPhanCong == "cho_duyet" ? "selected" : null)">SV đăng ký (Chờ duyệt)</option>
+                <option value="chua_phan_cong" selected="@(ViewBag.TrangThaiPhanCong == "chua_phan_cong" ? "selected" : null)">Chưa phân công GVHD</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-primary w-100"><i class="bi bi-funnel me-1"></i> Lọc</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Xóa</a>
+        </div>
+    </form>
+</div>
+
+<!-- Bảng danh sách sinh viên -->
+<div class="card overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>MSSV</th>
+                    <th>Họ và Tên</th>
+                    <th>Lớp & Ngành</th>
+                    <th>Nơi Thực Tập Doanh Nghiệp</th>
+                    <th>Vị trí</th>
+                    <th>Giảng Viên Hướng Dẫn</th>
+                    <th class="text-end">Phân công / Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">Không tìm thấy sinh viên nào phù hợp.</td>
+                    </tr>
+                }
+                @foreach (var item in Model)
+                {
+                    var pc = item.DanhSachPhanCong.FirstOrDefault(p => p.DotThucTapId == dotId);
+                    <tr>
+                        <td class="fw-bold text-primary">@item.Mssv</td>
+                        <td class="fw-semibold">
+                            @item.Hovaten
+                            <small class="text-muted d-block">@item.Email</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border">@item.Lop</span>
+                            <small class="text-muted d-block">@item.ChuyenNganh</small>
+                        </td>
+                        <td>
+                            <strong class="text-dark">@(pc?.DoanhNghiep?.TenDoanhNghiep ?? pc?.TenCtyNgoai ?? "Doanh nghiệp CNTT thực tập")</strong>
+                            <small class="text-muted d-block"><i class="bi bi-clock-history me-1"></i>Thời gian: @(pc?.SoThangThucTap ?? 3) tháng</small>
+                        </td>
+                        <td>
+                            <span class="small text-secondary">@(pc?.ViTriThucTap ?? "Thực tập sinh IT")</span>
+                        </td>
+                        <td>
+                            @if (pc?.GiangVien != null)
+                            {
+                                @if (pc.TrangThaiDuyet == "cho_gv_duyet")
+                                {
+                                    <span class="badge bg-warning bg-opacity-10 text-warning border">
+                                        <i class="bi bi-send me-1"></i>Chờ GV duyệt: @pc.GiangVien.Hovaten
+                                    </span>
+                                }
+                                else if (pc.TrangThaiDuyet == "gv_tu_choi")
+                                {
+                                    <span class="badge bg-danger bg-opacity-10 text-danger border" title="@pc.LyDoTuChoi">
+                                        <i class="bi bi-x-circle me-1"></i>GV từ chối: @pc.GiangVien.Hovaten
+                                    </span>
+                                }
+                                else if (pc.TrangThaiDuyet == "cho_duyet")
+                                {
+                                    <div class="mb-1">
+                                        <span class="badge bg-warning bg-opacity-10 text-warning border">
+                                            <i class="bi bi-hourglass-split me-1"></i>SV Đăng ký: @pc.GiangVien.Hovaten
+                                        </span>
+                                    </div>
+                                    <form asp-action="DuyetNguyenVong" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="phanCongId" value="@pc.Id" />
+                                        <button type="submit" class="btn btn-sm btn-success py-0 px-2" style="font-size: 0.75rem;">
+                                            <i class="bi bi-check me-1"></i>Duyệt
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success bg-opacity-10 text-success border">
+                                        <i class="bi bi-person-check-fill me-1"></i>@pc.GiangVien.Hovaten
+                                    </span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger bg-opacity-10 text-danger border">
+                                    <i class="bi bi-exclamation-circle me-1"></i>Chưa phân công
+                                </span>
+                            }
+                        </td>
+                        <td class="text-end" style="white-space: nowrap; width: 1%;">
+                            <div class="d-inline-flex gap-1 align-items-center">
+                                <!-- Nút mở Modal Phân công nhanh -->
+                                <button type="button" class="btn btn-sm btn-outline-primary" 
+                                        data-bs-toggle="modal" data-bs-target="#modalPhanCong_@item.Id" title="Phân công hoặc đổi GVHD">
+                                    <i class="bi bi-person-gear"></i> Phân công
+                                </button>
+                                
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary" title="Chỉnh sửa thông tin">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+
+                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline m-0 p-0" onsubmit="return confirm('Bạn có chắc chắn muốn ẩn sinh viên này?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Ẩn sinh viên">
+                                        <i class="bi bi-eye-slash"></i>
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- Modal Phân công GVHD cho Sinh viên này -->
+                            <div class="modal fade text-start" id="modalPhanCong_@item.Id" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form asp-action="PhanCongGVHD" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="sinhVienId" value="@item.Id" />
+
+                                            <div class="modal-header">
+                                                <h5 class="modal-title fw-bold">Phân Công GVHD Cho Sinh Viên</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="alert alert-light border small mb-3">
+                                                    <strong>Sinh viên:</strong> @item.Hovaten (@item.Mssv) - Lớp: @item.Lop<br />
+                                                    <strong>Ngành:</strong> @item.ChuyenNganh<br />
+                                                    <strong>GVHD hiện tại:</strong> @(pc?.GiangVien?.Hovaten ?? "Chưa có")
+                                                </div>
+
+                                                <label class="form-label fw-semibold small">Chọn Giảng viên Hướng dẫn:</label>
+                                                <select name="giangVienId" class="form-select mb-3" required>
+                                                    <option value="">-- Chọn 1 trong các giảng viên khoa --</option>
+                                                    @foreach (var gv in danhSachGv)
+                                                    {
+                                                        int count = gv.DanhSachPhanCong.Count(p => p.DotThucTapId == dotId && p.TrangThaiDuyet != "tu_choi" && p.TrangThaiDuyet != "gv_tu_choi");
+                                                        bool isFull = count >= gv.SoLuongToiDa;
+                                                        <option value="@gv.Id" 
+                                                                selected="@(pc?.GiangVienId == gv.Id ? "selected" : null)" 
+                                                                disabled="@(isFull && pc?.GiangVienId != gv.Id ? "disabled" : null)">
+                                                            @gv.Hovaten (@gv.HocVi) - [@count/@gv.SoLuongToiDa SV] @(isFull ? "(ĐÃ ĐỦ CHỈ TIÊU)" : "")
+                                                        </option>
+                                                    }
+                                                </select>
+                                                <div class="form-text small">
+                                                    Danh sách hiển thị tỷ lệ đã nhận trên hạn ngạch tối đa của từng giảng viên.
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                @if (pc?.GiangVienId != null)
+                                                {
+                                                    <button type="button" class="btn btn-outline-danger btn-sm me-auto" 
+                                                            onclick="document.getElementById('formHuyPhanCong_@pc.Id').submit();">
+                                                        Hủy phân công
+                                                    </button>
+                                                }
+                                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
+                                                <button type="submit" class="btn btn-primary btn-sm">Xác Nhận Phân Công</button>
+                                            </div>
+                                        </form>
+
+                                        @if (pc?.GiangVienId != null)
+                                        {
+                                            <form id="formHuyPhanCong_@pc.Id" asp-action="HuyPhanCong" method="post" style="display:none;">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="phanCongId" value="@pc.Id" />
+                                            </form>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Phân trang 10 sinh viên / trang -->
+    @if (ViewBag.TotalPages > 1)
+    {
+        <div class="card-footer bg-white d-flex flex-wrap justify-content-between align-items-center py-3">
+            <div class="small text-muted mb-2 mb-md-0">
+                Hiển thị <strong>@Model.Count()</strong> / <strong>@ViewBag.TotalItems</strong> sinh viên (Trang @ViewBag.CurrentPage / @ViewBag.TotalPages)
+            </div>
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item @(ViewBag.CurrentPage <= 1 ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" 
+                           asp-route-page="@(ViewBag.CurrentPage - 1)" 
+                           asp-route-search="@ViewBag.Search" 
+                           asp-route-chuyenNganh="@ViewBag.ChuyenNganh" 
+                           asp-route-lop="@ViewBag.Lop" 
+                           asp-route-trangThaiPhanCong="@ViewBag.TrangThaiPhanCong">
+                            <i class="bi bi-chevron-left"></i> Trước
+                        </a>
+                    </li>
+                    @for (int p = 1; p <= ViewBag.TotalPages; p++)
+                    {
+                        <li class="page-item @(ViewBag.CurrentPage == p ? "active" : "")">
+                            <a class="page-link" asp-action="Index" 
+                               asp-route-page="@p" 
+                               asp-route-search="@ViewBag.Search" 
+                               asp-route-chuyenNganh="@ViewBag.ChuyenNganh" 
+                               asp-route-lop="@ViewBag.Lop" 
+                               asp-route-trangThaiPhanCong="@ViewBag.TrangThaiPhanCong">@p</a>
+                        </li>
+                    }
+                    <li class="page-item @(ViewBag.CurrentPage >= ViewBag.TotalPages ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" 
+                           asp-route-page="@(ViewBag.CurrentPage + 1)" 
+                           asp-route-search="@ViewBag.Search" 
+                           asp-route-chuyenNganh="@ViewBag.ChuyenNganh" 
+                           asp-route-lop="@ViewBag.Lop" 
+                           asp-route-trangThaiPhanCong="@ViewBag.TrangThaiPhanCong">
+                            Sau <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
+</div>

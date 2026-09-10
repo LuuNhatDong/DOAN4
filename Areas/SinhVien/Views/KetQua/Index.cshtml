@@ -1,0 +1,80 @@
+@model QuanLyThucTap.Models.DanhGiaKetQua
+@{
+    ViewData["Title"] = "Kết quả đánh giá thực tập";
+    var pc = ViewBag.PhanCong as QuanLyThucTap.Models.PhanCongHuongDan;
+    var sv = ViewBag.SinhVien as QuanLyThucTap.Models.SinhVien;
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card p-4">
+            <div class="text-center pb-3 border-bottom mb-4">
+                <i class="bi bi-award-fill text-warning fs-1"></i>
+                <h4 class="fw-bold mt-2 mb-1">KẾT QUẢ ĐÁNH GIÁ THỰC TẬP TỐT NGHIỆP</h4>
+                <p class="text-muted small mb-0">Học kỳ: @(pc?.DotThucTap?.TenDot ?? "---") - Năm học: @(pc?.DotThucTap?.NamHoc ?? "---")</p>
+            </div>
+
+            @if (Model == null)
+            {
+                <div class="alert alert-light text-center py-5 text-muted">
+                    <i class="bi bi-hourglass-split fs-2 d-block mb-2"></i>
+                    Bảng điểm tổng kết chưa được khóa. Giảng viên hướng dẫn sẽ công bố điểm sau khi kết thúc đợt thực tập.
+                </div>
+            }
+            else
+            {
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-md-3 text-center">
+                        <div class="p-3 bg-light rounded-3">
+                            <small class="text-muted d-block mb-1">1. Điểm định kỳ (20%)</small>
+                            <span class="fs-5 fw-bold text-dark">@Model.DiemDinhKy.ToString("0.0")</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3 text-center">
+                        <div class="p-3 bg-light rounded-3">
+                            <small class="text-muted d-block mb-1">2. Điểm giữa kỳ (20%)</small>
+                            <span class="fs-5 fw-bold text-dark">@Model.DiemGiuaKy.ToString("0.0")</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3 text-center">
+                        <div class="p-3 bg-light rounded-3">
+                            <small class="text-muted d-block mb-1">3. Điểm cuối kỳ (30%)</small>
+                            <span class="fs-5 fw-bold text-dark">@Model.DiemCuoiKy.ToString("0.0")</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3 text-center">
+                        <div class="p-3 bg-light rounded-3">
+                            <small class="text-muted d-block mb-1">4. Điểm doanh nghiệp (30%)</small>
+                            <span class="fs-5 fw-bold text-dark">@Model.DiemDoanhNghiep.ToString("0.0")</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thẻ Điểm Tổng Kết Hệ 10 & Điểm Chữ -->
+                <div class="p-4 rounded-3 text-center mb-4 @(Model.KetQua == "DAT" ? "bg-success bg-opacity-10 text-success border border-success border-opacity-25" : "bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25")">
+                    <div class="text-uppercase small fw-bold tracking-wider mb-1">Điểm Tổng Kết (Hệ 10)</div>
+                    <div class="display-4 fw-bold">@Model.DiemTongKetHe10.ToString("0.00")</div>
+                    <div class="mt-2">
+                        <span class="badge @(Model.KetQua == "DAT" ? "bg-success" : "bg-danger") px-3 py-2 fs-6">
+                            Điểm chữ: @Model.DiemChu — @(Model.KetQua == "DAT" ? "KẾT QUẢ: ĐẠT" : "KẾT QUẢ: KHÔNG ĐẠT")
+                        </span>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.NhanXetTongKet))
+                {
+                    <div class="mb-4">
+                        <h6 class="fw-bold mb-2"><i class="bi bi-chat-quote-fill text-primary me-1"></i>Nhận xét từ Giảng viên hướng dẫn:</h6>
+                        <div class="p-3 bg-light rounded-3 small">
+                            @Model.NhanXetTongKet
+                        </div>
+                    </div>
+                }
+
+                <div class="text-muted small text-end">
+                    Ngày chốt điểm: @Model.NgayChotDiem.ToString("dd/MM/yyyy")
+                </div>
+            }
+        </div>
+    </div>
+</div>

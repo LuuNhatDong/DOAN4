@@ -1,0 +1,70 @@
+@model QuanLyThucTap.Models.GiangVien
+@{
+    ViewData["Title"] = "Chỉnh sửa Giảng viên";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card p-4">
+            <h4 class="fw-bold mb-2"><i class="bi bi-pencil-square text-primary me-2"></i>Chỉnh Sửa Thông Tin Giảng Viên</h4>
+            <p class="text-muted small mb-3">Cập nhật thông tin liên lạc cho giảng viên: <strong>@Model.Hovaten</strong> (@Model.Magv)</p>
+
+            <div class="alert alert-info border-0 small py-2 mb-3">
+                <i class="bi bi-info-circle-fill me-1"></i>
+                <strong>Quy định nhân sự khoa:</strong> Các thông tin hồ sơ cán bộ (Mã GV, Họ tên, Học vị, Bộ môn, Email) được quản lý tập trung theo quyết định của Khoa. Quản trị viên chỉ có quyền cập nhật <strong>Số điện thoại liên lạc</strong>. (Chỉ tiêu hướng dẫn có thể điều chỉnh nhanh tại màn hình danh sách).
+            </div>
+
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small text-muted">Mã Giảng Viên (MSGV)</label>
+                        <input asp-for="Magv" class="form-control bg-light" readonly />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small text-muted">Họ và Tên</label>
+                        <input asp-for="Hovaten" class="form-control bg-light" readonly />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small text-muted">Học vị</label>
+                        <input asp-for="HocVi" class="form-control bg-light" readonly />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small text-muted">Bộ môn</label>
+                        <input asp-for="BoMon" class="form-control bg-light" readonly />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small text-muted">Email trường cấp</label>
+                        <input asp-for="Email" type="email" class="form-control bg-light" readonly />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small text-muted">Số sinh viên tối đa nhận</label>
+                        <input asp-for="SoLuongToiDa" class="form-control bg-light" readonly />
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="p-3 border border-primary border-opacity-25 rounded-3 bg-primary bg-opacity-10">
+                            <label class="form-label fw-bold text-primary small mb-1">
+                                <i class="bi bi-telephone-fill me-1"></i> Số điện thoại liên lạc (Được phép chỉnh sửa) *
+                            </label>
+                            <input asp-for="Sdt" class="form-control form-control-lg fs-6" placeholder="Nhập số điện thoại (ví dụ: 0901234567)" required autofocus />
+                            <div class="form-text small text-muted">Số điện thoại dùng để sinh viên và ban quản lý khoa liên hệ công việc.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Hủy bỏ</a>
+                    <button type="submit" class="btn btn-primary px-4"><i class="bi bi-check-lg me-1"></i> Lưu Cập Nhật</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

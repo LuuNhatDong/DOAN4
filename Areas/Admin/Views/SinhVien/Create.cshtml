@@ -1,0 +1,60 @@
+@model QuanLyThucTap.Models.SinhVien
+@{
+    ViewData["Title"] = "Thêm Sinh viên mới";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card p-4">
+            <h4 class="fw-bold mb-3"><i class="bi bi-person-plus text-primary me-2"></i>Thêm Sinh Viên Mới</h4>
+            <p class="text-muted small mb-4">Hệ thống sẽ tự động tạo tài khoản đăng nhập với mật khẩu mặc định là <code>123456</code></p>
+
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="All" class="text-danger small mb-3"></div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Mã Số Sinh Viên (MSSV) *</label>
+                        <input asp-for="Mssv" class="form-control" placeholder="Ví dụ: HTTT2311017" required />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Họ và Tên *</label>
+                        <input asp-for="Hovaten" class="form-control" placeholder="Ví dụ: Lưu Nhật Đông" required />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Lớp *</label>
+                        <input asp-for="Lop" class="form-control" placeholder="Ví dụ: HTTT2311" required />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Chuyên ngành *</label>
+                        <input asp-for="ChuyenNganh" class="form-control" value="Hệ thống thông tin" required />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Email trường cấp *</label>
+                        <input asp-for="Email" type="email" class="form-control" placeholder="dong@student.ctuet.edu.vn" required />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Số điện thoại</label>
+                        <input asp-for="Sdt" class="form-control" placeholder="0901234567" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Điểm tích lũy (GPA)</label>
+                        <input asp-for="Gpa" type="number" step="0.01" min="0" max="4" class="form-control" value="3.50" />
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Hủy bỏ</a>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i> Lưu Sinh Viên</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
