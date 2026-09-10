@@ -141,10 +141,6 @@
                        asp-area="Admin" asp-controller="GiangVien" asp-action="Index">
                         <i class="bi bi-person-workspace"></i> Quản lý Giảng viên
                     </a>
-                    <a class="nav-link-custom @(ViewContext.RouteData.Values["controller"]?.ToString() == "DoanhNghiep" ? "active" : "")" 
-                       asp-area="Admin" asp-controller="DoanhNghiep" asp-action="Index">
-                        <i class="bi bi-building"></i> Đối tác Doanh nghiệp
-                    </a>
                     <a class="nav-link-custom @(ViewContext.RouteData.Values["controller"]?.ToString() == "DotThucTap" ? "active" : "")" 
                        asp-area="Admin" asp-controller="DotThucTap" asp-action="Index">
                         <i class="bi bi-calendar3"></i> Cấu hình Đợt thực tập

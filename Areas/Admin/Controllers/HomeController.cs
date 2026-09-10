@@ -25,7 +25,6 @@ namespace QuanLyThucTap.Areas.Admin.Controllers
             // 2. Thống kê tổng quan cố định trường/khoa
             ViewBag.TongSinhVien = await _context.SinhViens.CountAsync(s => s.TrangThai == "hoat_dong");
             ViewBag.TongGiangVien = await _context.GiangViens.CountAsync(g => g.TrangThai == "hoat_dong");
-            ViewBag.TongDoanhNghiep = await _context.DoanhNghieps.CountAsync(d => d.TrangThai == "hoat_dong");
 
             // 3. Phân bố sinh viên theo 4 ngành Khoa CNTT
             var svQuery = _context.SinhViens.Where(s => s.TrangThai == "hoat_dong");
@@ -42,7 +41,6 @@ namespace QuanLyThucTap.Areas.Admin.Controllers
             }
 
             var danhSachPhanCong = await query
-                .Include(p => p.DoanhNghiep)
                 .Include(p => p.GiangVien)
                 .Include(p => p.SinhVien)
                 .ToListAsync();
@@ -56,16 +54,21 @@ namespace QuanLyThucTap.Areas.Admin.Controllers
             ViewBag.HoanThanh = danhSachPhanCong.Count(p => p.TrangThaiDuyet == "hoan_thanh");
             ViewBag.TuChoi = danhSachPhanCong.Count(p => p.TrangThaiDuyet == "tu_choi");
 
-            // 5. Doanh nghiệp tiếp nhận nhiều nhất (kết hợp cả cty đối tác và cty tự liên hệ)
-            var topDoanhNghiep = danhSachPhanCong
-                .Select(p => !string.IsNullOrEmpty(p.TenCtyNgoai) ? p.TenCtyNgoai : (p.DoanhNghiep != null ? p.DoanhNghiep.TenVietTat : "Chưa xác định"))
-                .GroupBy(ten => ten)
-                .Select(g => new { Ten = g.Key, SoLuong = g.Count() })
+            // 5. Thống kê phân công Giảng viên hướng dẫn trong đợt
+            var topGiangVien = danhSachPhanCong
+                .Where(p => p.GiangVien != null)
+                .GroupBy(p => new { p.GiangVien!.Hovaten, p.GiangVien.HocVi, p.GiangVien.BoMon })
+                .Select(g => new { 
+                    Ten = g.Key.Hovaten, 
+                    HocVi = g.Key.HocVi,
+                    BoMon = g.Key.BoMon,
+                    SoLuong = g.Count() 
+                })
                 .OrderByDescending(x => x.SoLuong)
-                .Take(5)
+                .Take(6)
                 .ToList();
 
-            ViewBag.TopDoanhNghiep = topDoanhNghiep;
+            ViewBag.TopGiangVien = topGiangVien;
 
             return View();
         }

@@ -93,11 +93,11 @@
     </div>
 </div>
 
-<!-- Biểu đồ & Top Doanh nghiệp -->
+<!-- Biểu đồ & Tình hình Phân công GVHD -->
 <div class="row g-4 mb-4">
     <!-- Biểu đồ trạng thái -->
     <div class="col-lg-7">
-        <div class="card p-4 h-100">
+        <div class="card p-4 h-100 shadow-sm">
             <h5 class="fw-bold mb-3"><i class="bi bi-pie-chart-fill text-primary me-2"></i>Phân bố Trạng thái Thực tập</h5>
             <div style="max-height: 280px;" class="d-flex justify-content-center">
                 <canvas id="chartTrangThai"></canvas>
@@ -105,26 +105,36 @@
         </div>
     </div>
 
-    <!-- Top Doanh nghiệp tiếp nhận -->
+    <!-- Phân công Giảng viên hướng dẫn -->
     <div class="col-lg-5">
-        <div class="card p-4 h-100">
-            <h5 class="fw-bold mb-3"><i class="bi bi-trophy-fill text-warning me-2"></i>Top Doanh Nghiệp Tiếp Nhận</h5>
+        <div class="card p-4 h-100 shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0"><i class="bi bi-person-workspace text-primary me-2"></i>Giảng Viên Hướng Dẫn</h5>
+                <a asp-controller="GiangVien" asp-action="Index" class="btn btn-sm btn-outline-primary py-0.5 px-2">Xem tất cả</a>
+            </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th>Doanh nghiệp</th>
-                            <th class="text-end">Số lượng SV</th>
+                            <th>Giảng viên</th>
+                            <th class="text-end">SV Hướng dẫn</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @if (ViewBag.TopDoanhNghiep != null)
+                        @if (ViewBag.TopGiangVien != null)
                         {
-                            foreach (var item in ViewBag.TopDoanhNghiep)
+                            foreach (var item in ViewBag.TopGiangVien)
                             {
                                 <tr>
-                                    <td class="fw-semibold">@item.Ten</td>
-                                    <td class="text-end"><span class="badge bg-light text-dark border px-2.5 py-1">@item.SoLuong SV</span></td>
+                                    <td>
+                                        <div class="fw-semibold text-dark">@item.Ten</div>
+                                        <small class="text-muted">@item.HocVi • @item.BoMon</small>
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1 fw-bold">
+                                            @item.SoLuong SV
+                                        </span>
+                                    </td>
                                 </tr>
                             }
                         }
