@@ -1,8 +1,18 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using QuanLyThucTap.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Cấu hình Forwarded Headers cho Render / Reverse Proxy HTTPS
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 // 1. Cấu hình DbContext kết nối Supabase PostgreSQL
 builder.Services.AddDbContext<ThucTapDbContext>(options =>
@@ -11,14 +21,30 @@ builder.Services.AddDbContext<ThucTapDbContext>(options =>
     options.UseNpgsql(connectionString);
 });
 
-// 2. Cấu hình Cookie Authentication cho phân quyền 3 vai trò
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+// 2. Cấu hình Cookie Authentication và Google OAuth
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    })
     .AddCookie(options =>
     {
         options.LoginPath = "/Account/Login";
         options.LogoutPath = "/Account/Logout";
         options.AccessDeniedPath = "/Account/AccessDenied";
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
+    })
+    .AddGoogle(options =>
+    {
+        var googleConfig = builder.Configuration.GetSection("Authentication:Google");
+        options.ClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID") 
+            ?? googleConfig["ClientId"] 
+            ?? "282374742719-sk3d0ekojrn0eicno6hgqkm4n06aj8ma.apps.googleusercontent.com";
+        options.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET") 
+            ?? googleConfig["ClientSecret"] 
+            ?? "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J";
+        options.CallbackPath = "/signin-google";
+        options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     });
 
 builder.Services.AddAuthorization(options =>
@@ -41,10 +67,11 @@ if (!string.IsNullOrEmpty(port))
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseForwardedHeaders();
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    app.UseForwardedHeaders();
 }
 app.UseStaticFiles();
 
