@@ -48,6 +48,60 @@ namespace QuanLyThucTap.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Edit(long id)
+        {
+            var dot = await _context.DotThucTaps.FindAsync(id);
+            if (dot == null) return NotFound();
+            return View(dot);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(long id, DotThucTap model)
+        {
+            if (id != model.Id) return NotFound();
+
+            var dot = await _context.DotThucTaps.FindAsync(id);
+            if (dot == null) return NotFound();
+
+            dot.TenDot = model.TenDot;
+            dot.NamHoc = model.NamHoc;
+            dot.NgayBatDau = model.NgayBatDau;
+            dot.NgayKetThuc = model.NgayKetThuc;
+            dot.HanDangKyCty = model.HanDangKyCty;
+            dot.HanNopDeCuong = model.HanNopDeCuong;
+            dot.UpdatedAt = DateTime.UtcNow;
+
+            if (model.TrangThaiKichHoat && !dot.TrangThaiKichHoat)
+            {
+                var others = await _context.DotThucTaps.Where(d => d.Id != id).ToListAsync();
+                others.ForEach(o => o.TrangThaiKichHoat = false);
+                dot.TrangThaiKichHoat = true;
+            }
+            else if (!model.TrangThaiKichHoat)
+            {
+                dot.TrangThaiKichHoat = false;
+            }
+
+            // Đồng bộ thời gian thực tập cố định cho tất cả sinh viên thuộc đợt này
+            if (dot.NgayKetThuc > dot.NgayBatDau)
+            {
+                var days = (dot.NgayKetThuc - dot.NgayBatDau).TotalDays;
+                int soThang = Math.Max(1, (int)Math.Round(days / 30.0));
+                var phanCongs = await _context.PhanCongHuongDans.Where(p => p.DotThucTapId == id).ToListAsync();
+                foreach (var pc in phanCongs)
+                {
+                    pc.SoThangThucTap = soThang;
+                    pc.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            TempData["Success"] = "Cập nhật đợt thực tập và đồng bộ thời gian cố định thành công!";
+            return RedirectToAction(nameof(Index));
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SetActive(long id)

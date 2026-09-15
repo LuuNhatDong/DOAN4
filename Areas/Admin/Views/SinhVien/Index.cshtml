@@ -104,7 +104,13 @@
                         </td>
                         <td>
                             <strong class="text-dark">@(pc?.DoanhNghiep?.TenDoanhNghiep ?? pc?.TenCtyNgoai ?? "Doanh nghiệp CNTT thực tập")</strong>
-                            <small class="text-muted d-block"><i class="bi bi-clock-history me-1"></i>Thời gian: @(pc?.SoThangThucTap ?? 3) tháng</small>
+                            <small class="text-muted d-block">
+                                <i class="bi bi-clock-history me-1"></i>Thời gian: @(pc?.SoThangThucTap ?? 3) tháng
+                                @if (pc?.DotThucTap != null)
+                                {
+                                    <span>(@pc.DotThucTap.NgayBatDau.ToString("dd/MM/yyyy") - @pc.DotThucTap.NgayKetThuc.ToString("dd/MM/yyyy"))</span>
+                                }
+                            </small>
                         </td>
                         <td>
                             <span class="small text-secondary">@(pc?.ViTriThucTap ?? "Thực tập sinh IT")</span>

@@ -39,7 +39,14 @@
             <ul class="list-unstyled mb-0 small">
                 <li class="mb-2"><strong>Công ty:</strong> @(Model.DoanhNghiep?.TenDoanhNghiep ?? Model.TenCtyNgoai ?? "Chưa có thông tin")</li>
                 <li class="mb-2"><strong>Vị trí thực tập:</strong> @(Model.ViTriThucTap ?? "Chưa khai báo")</li>
-                <li class="mb-0"><strong>Thời gian thực tập:</strong> <span class="badge bg-primary">@Model.SoThangThucTap tháng</span></li>
+                <li class="mb-0">
+                    <strong>Thời gian (cố định):</strong> 
+                    <span class="badge bg-primary">@Model.SoThangThucTap tháng</span>
+                    @if (Model.DotThucTap != null)
+                    {
+                        <span class="text-muted ms-1">(@Model.DotThucTap.NgayBatDau.ToString("dd/MM/yyyy") - @Model.DotThucTap.NgayKetThuc.ToString("dd/MM/yyyy"))</span>
+                    }
+                </li>
             </ul>
         </div>
 

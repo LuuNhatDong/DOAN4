@@ -3,7 +3,10 @@
     ViewData["Title"] = "Đăng ký nơi thực tập & Chọn GVHD";
     var sv = ViewBag.SinhVien as QuanLyThucTap.Models.SinhVien;
     var danhSachGv = ViewBag.DanhSachGiangVien as List<QuanLyThucTap.Models.GiangVien> ?? new List<QuanLyThucTap.Models.GiangVien>();
+    var dot = (ViewBag.DotThucTap as QuanLyThucTap.Models.DotThucTap) ?? Model?.DotThucTap;
     var dotId = (long)(ViewBag.DotId ?? 0);
+    int soTuan = ViewBag.SoTuan != null ? (int)ViewBag.SoTuan : 12;
+    int soThang = ViewBag.SoThang != null ? (int)ViewBag.SoThang : 3;
 }
 
 <div class="row justify-content-center">
@@ -58,7 +61,11 @@
                         <span class="text-primary fw-bold">@(Model?.GiangVien?.Hovaten ?? "Chưa có GVHD")</span>
                     </div>
                     <div class="col-md-6">
-                        <strong>Đợt thực tập:</strong> @(Model?.DotThucTap?.TenDot ?? "Học kỳ hiện tại")
+                        <strong>Đợt thực tập:</strong> @(dot?.TenDot ?? "Học kỳ hiện tại")
+                        @if (dot != null)
+                        {
+                            <span class="text-muted">(@dot.NgayBatDau.ToString("dd/MM/yyyy") — @dot.NgayKetThuc.ToString("dd/MM/yyyy"))</span>
+                        }
                     </div>
                 </div>
             </div>
@@ -113,19 +120,25 @@
 
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Vị trí thực tập dự kiến *</label>
+                            <label class="form-label small fw-semibold">Vị trí thực tập *</label>
                             <input type="text" name="viTriThucTap" class="form-control" 
                                    value="@Model?.ViTriThucTap" 
                                    placeholder="Ví dụ: Lập trình viên .NET, Frontend React, BA, QA..." required />
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Thời gian thực tập dự kiến *</label>
-                            <select name="soThangThucTap" class="form-select" required>
-                                <option value="2" selected="@(Model?.SoThangThucTap == 2 ? "selected" : null)">2 tháng (Tương đương 2 kỳ tháng / 8 tuần)</option>
-                                <option value="3" selected="@(Model?.SoThangThucTap == 3 || Model?.SoThangThucTap == null ? "selected" : null)">3 tháng (Tương đương 3 kỳ tháng / 12 tuần)</option>
-                                <option value="4" selected="@(Model?.SoThangThucTap == 4 ? "selected" : null)">4 tháng (Tương đương 4 kỳ tháng / 16 tuần)</option>
-                            </select>
-                            <div class="form-text small text-muted">Hệ thống sẽ tự động phân chia số kỳ nộp nhật ký định kỳ theo thời gian này.</div>
+                            <label class="form-label small fw-semibold">
+                                <i class="bi bi-calendar-check text-primary me-1"></i>Thời gian thực tập (Cố định theo đợt)
+                            </label>
+                            <div class="form-control bg-body-tertiary text-dark d-flex align-items-center justify-content-between">
+                                <span class="fw-semibold">
+                                    <i class="bi bi-calendar3 me-1 text-primary"></i>
+                                    @(dot != null ? $"{dot.NgayBatDau:dd/MM/yyyy} — {dot.NgayKetThuc:dd/MM/yyyy}" : "Theo kế hoạch Khoa")
+                                </span>
+                                <span class="badge bg-primary px-2.5 py-1">
+                                    @soTuan tuần (@soThang tháng)
+                                </span>
+                            </div>
+                            <div class="form-text small text-muted">Thời gian thực tập được thiết lập cố định theo kế hoạch đợt thực tập của Khoa CNTT.</div>
                         </div>
                     </div>
                 </div>

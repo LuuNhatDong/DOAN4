@@ -1,0 +1,79 @@
+﻿@model QuanLyThucTap.Models.DotThucTap
+@{
+    ViewData["Title"] = "Chỉnh sửa đợt thực tập";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card p-4 shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold mb-0">
+                    <i class="bi bi-pencil-square text-primary me-2"></i>Chỉnh Sửa Đợt Thực Tập
+                </h4>
+                <a asp-action="Index" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+                </a>
+            </div>
+            <p class="text-muted small mb-4">
+                Thời gian bắt đầu và kết thúc bạn cấu hình tại đây sẽ là thời gian thực tập <strong>cố định</strong> áp dụng cho toàn bộ sinh viên trong đợt này.
+            </p>
+
+            <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label fw-semibold small">Tên đợt thực tập *</label>
+                        <input asp-for="TenDot" class="form-control" placeholder="Ví dụ: Thực tập tốt nghiệp HK2 (2025 - 2026)" required />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold small">Năm học *</label>
+                        <input asp-for="NamHoc" class="form-control" placeholder="2025 - 2026" required />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">
+                            <i class="bi bi-calendar-event text-primary me-1"></i>Ngày bắt đầu thực tập *
+                        </label>
+                        <input name="NgayBatDau" type="date" class="form-control" value="@Model.NgayBatDau.ToString("yyyy-MM-dd")" required />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">
+                            <i class="bi bi-calendar-check text-primary me-1"></i>Ngày kết thúc thực tập *
+                        </label>
+                        <input name="NgayKetThuc" type="date" class="form-control" value="@Model.NgayKetThuc.ToString("yyyy-MM-dd")" required />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Hạn đăng ký nơi thực tập *</label>
+                        <input name="HanDangKyCty" type="date" class="form-control" value="@Model.HanDangKyCty.ToString("yyyy-MM-dd")" required />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Hạn nộp đề cương thực tập *</label>
+                        <input name="HanNopDeCuong" type="date" class="form-control" value="@Model.HanNopDeCuong.ToString("yyyy-MM-dd")" required />
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-check form-switch mt-2">
+                            <input asp-for="TrangThaiKichHoat" class="form-check-input" type="checkbox" id="kichHoatSwitch" />
+                            <label class="form-check-label fw-semibold" for="kichHoatSwitch">
+                                Kích hoạt làm đợt thực tập chính thức hiện tại
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Hủy bỏ</a>
+                    <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                        <i class="bi bi-check-lg me-1"></i> Lưu Cập Nhật
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

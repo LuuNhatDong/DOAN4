@@ -30,10 +30,21 @@
             <tbody>
                 @foreach (var item in Model)
                 {
+                    var durationDays = (item.NgayKetThuc - item.NgayBatDau).TotalDays;
+                    var soTuan = Math.Max(1, (int)Math.Round(durationDays / 7.0));
+                    var soThang = Math.Max(1, (int)Math.Round(durationDays / 30.0));
+
                     <tr class="@(item.TrangThaiKichHoat ? "table-primary bg-opacity-25" : "")">
                         <td class="fw-bold">@item.TenDot</td>
                         <td><span class="badge bg-light text-dark border">@item.NamHoc</span></td>
-                        <td class="small">@item.NgayBatDau.ToString("dd/MM/yyyy") - @item.NgayKetThuc.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <div class="small fw-semibold text-dark">
+                                <i class="bi bi-calendar3 text-primary me-1"></i>@item.NgayBatDau.ToString("dd/MM/yyyy") - @item.NgayKetThuc.ToString("dd/MM/yyyy")
+                            </div>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle mt-1" style="font-size: 0.72rem;">
+                                @soTuan tuần (@soThang tháng)
+                            </span>
+                        </td>
                         <td class="small text-danger fw-semibold">@item.HanDangKyCty.ToString("dd/MM/yyyy")</td>
                         <td class="small text-danger fw-semibold">@item.HanNopDeCuong.ToString("dd/MM/yyyy")</td>
                         <td class="text-center">
@@ -46,9 +57,12 @@
                                 <span class="badge bg-secondary">Không hoạt động</span>
                             }
                         </td>
-                        <td class="text-end">
+                        <td class="text-end" style="white-space: nowrap;">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary me-1">
+                                <i class="bi bi-pencil me-1"></i>Sửa
+                            </a>
                             <a asp-action="ChiTiet" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary me-1">
-                                <i class="bi bi-eye me-1"></i>Xem thông tin đợt
+                                <i class="bi bi-eye me-1"></i>Xem SV
                             </a>
                             @if (!item.TrangThaiKichHoat)
                             {

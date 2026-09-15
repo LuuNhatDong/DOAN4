@@ -57,7 +57,14 @@
                 <ul class="list-unstyled mb-0 small">
                     <li class="mb-2"><strong>Doanh nghiệp:</strong> @Model.DoanhNghiep.TenDoanhNghiep (@Model.DoanhNghiep.TenVietTat)</li>
                     <li class="mb-2"><strong>Vị trí:</strong> @(Model.ViTriThucTap ?? "---")</li>
-                    <li class="mb-2"><strong>Thời gian:</strong> <span class="badge bg-primary">@(Model.SoThangThucTap) tháng</span></li>
+                    <li class="mb-2">
+                        <strong>Thời gian (cố định):</strong> 
+                        <span class="badge bg-primary">@(Model.SoThangThucTap) tháng</span>
+                        @if (Model.DotThucTap != null)
+                        {
+                            <span class="text-muted ms-1">(@Model.DotThucTap.NgayBatDau.ToString("dd/MM/yyyy") - @Model.DotThucTap.NgayKetThuc.ToString("dd/MM/yyyy"))</span>
+                        }
+                    </li>
                     <li><strong>Địa chỉ:</strong> @Model.DoanhNghiep.DiaChi</li>
                 </ul>
             }
@@ -66,7 +73,14 @@
                 <ul class="list-unstyled mb-0 small">
                     <li class="mb-2"><strong>Đơn vị tự tìm:</strong> @Model.TenCtyNgoai</li>
                     <li class="mb-2"><strong>Vị trí:</strong> @(Model.ViTriThucTap ?? "---")</li>
-                    <li><strong>Thời gian:</strong> <span class="badge bg-primary">@(Model.SoThangThucTap) tháng</span></li>
+                    <li>
+                        <strong>Thời gian (cố định):</strong> 
+                        <span class="badge bg-primary">@(Model.SoThangThucTap) tháng</span>
+                        @if (Model.DotThucTap != null)
+                        {
+                            <span class="text-muted ms-1">(@Model.DotThucTap.NgayBatDau.ToString("dd/MM/yyyy") - @Model.DotThucTap.NgayKetThuc.ToString("dd/MM/yyyy"))</span>
+                        }
+                    </li>
                 </ul>
             }
             else

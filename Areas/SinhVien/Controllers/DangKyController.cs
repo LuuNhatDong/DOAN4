@@ -32,15 +32,31 @@ namespace QuanLyThucTap.Areas.SinhVien.Controllers
 
             var phanCong = sinhVien.DanhSachPhanCong.OrderByDescending(p => p.Id).FirstOrDefault();
             
-            // Danh sách 9 Giảng viên cố định của trường để SV đăng ký nguyện vọng
-            var dotId = phanCong?.DotThucTapId ?? (await _context.DotThucTaps.Where(d => d.TrangThaiKichHoat).Select(d => d.Id).FirstOrDefaultAsync());
+            // Lấy thông tin đợt thực tập cấu hình bởi Admin
+            var dot = phanCong?.DotThucTap ?? 
+                      await _context.DotThucTaps.FirstOrDefaultAsync(d => d.TrangThaiKichHoat) ?? 
+                      await _context.DotThucTaps.OrderByDescending(d => d.Id).FirstOrDefaultAsync();
+
+            int soTuan = 12;
+            int soThang = 3;
+            if (dot != null && dot.NgayKetThuc > dot.NgayBatDau)
+            {
+                var days = (dot.NgayKetThuc - dot.NgayBatDau).TotalDays;
+                soTuan = Math.Max(1, (int)Math.Round(days / 7.0));
+                soThang = Math.Max(1, (int)Math.Round(days / 30.0));
+            }
+
+            // Danh sách Giảng viên cố định của trường để SV đăng ký nguyện vọng
             ViewBag.DanhSachGiangVien = await _context.GiangViens
                 .Include(g => g.DanhSachPhanCong)
                 .Where(g => g.TrangThai == "hoat_dong")
                 .OrderBy(g => g.Magv)
                 .ToListAsync();
 
-            ViewBag.DotId = dotId;
+            ViewBag.DotId = dot?.Id ?? 0;
+            ViewBag.DotThucTap = dot;
+            ViewBag.SoTuan = soTuan;
+            ViewBag.SoThang = soThang;
             ViewBag.SinhVien = sinhVien;
 
             return View(phanCong);
@@ -51,7 +67,6 @@ namespace QuanLyThucTap.Areas.SinhVien.Controllers
         public async Task<IActionResult> Save(
             long? phanCongId, 
             long? giangVienId,
-            int? soThangThucTap,
             string? tenCtyNgoai, 
             string? viTriThucTap)
         {
@@ -67,11 +82,8 @@ namespace QuanLyThucTap.Areas.SinhVien.Controllers
 
             if (phanCong == null)
             {
-                var dotActive = await _context.DotThucTaps.FirstOrDefaultAsync(d => d.TrangThaiKichHoat);
-                if (dotActive == null)
-                {
-                    dotActive = await _context.DotThucTaps.OrderByDescending(d => d.Id).FirstOrDefaultAsync();
-                }
+                var dotActive = await _context.DotThucTaps.FirstOrDefaultAsync(d => d.TrangThaiKichHoat)
+                                ?? await _context.DotThucTaps.OrderByDescending(d => d.Id).FirstOrDefaultAsync();
 
                 if (dotActive == null)
                 {
@@ -88,10 +100,16 @@ namespace QuanLyThucTap.Areas.SinhVien.Controllers
                 _context.PhanCongHuongDans.Add(phanCong);
             }
 
-            // Cập nhật số tháng thực tập (2, 3, 4 tháng...)
-            if (soThangThucTap.HasValue && soThangThucTap.Value >= 1 && soThangThucTap.Value <= 12)
+            // Thời gian thực tập CỐ ĐỊNH theo cấu hình của Admin trong Đợt thực tập
+            var dot = await _context.DotThucTaps.FindAsync(phanCong.DotThucTapId);
+            if (dot != null && dot.NgayKetThuc > dot.NgayBatDau)
             {
-                phanCong.SoThangThucTap = soThangThucTap.Value;
+                var days = (dot.NgayKetThuc - dot.NgayBatDau).TotalDays;
+                phanCong.SoThangThucTap = Math.Max(1, (int)Math.Round(days / 30.0));
+            }
+            else
+            {
+                phanCong.SoThangThucTap = 3;
             }
 
             // Kiểm tra GVHD nếu có chọn giảng viên
@@ -121,13 +139,13 @@ namespace QuanLyThucTap.Areas.SinhVien.Controllers
             }
 
             phanCong.TenCtyNgoai = string.IsNullOrWhiteSpace(tenCtyNgoai) ? "Doanh nghiệp CNTT thực tập" : tenCtyNgoai;
-            phanCong.ViTriThucTap = viTriThucTap;
+            phanCong.ViTriThucTap = string.IsNullOrWhiteSpace(viTriThucTap) ? "Thực tập sinh" : viTriThucTap;
             phanCong.MentorDoanhNghiep = null;
             phanCong.SdtMentor = null;
             phanCong.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
-            TempData["Success"] = "Đăng ký thông tin thực tập và gửi yêu cầu đến Giảng viên hướng dẫn thành công!";
+            TempData["Success"] = "Đăng ký thông tin nơi thực tập và gửi yêu cầu đến Giảng viên hướng dẫn thành công!";
 
             return RedirectToAction(nameof(Index));
         }
