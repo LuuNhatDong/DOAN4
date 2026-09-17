@@ -37,6 +37,14 @@ namespace QuanLyThucTap.Models
         [Column("kho_khan_vuong_mac")]
         public string? KhoKhanVuongMac { get; set; }
 
+        [Column("file_bao_cao_url")]
+        [StringLength(500)]
+        public string? FileBaoCaoUrl { get; set; }
+
+        [Column("link_drive")]
+        [StringLength(500)]
+        public string? LinkDrive { get; set; }
+
         [Column("diem_so")]
         public decimal? DiemSo { get; set; }
 

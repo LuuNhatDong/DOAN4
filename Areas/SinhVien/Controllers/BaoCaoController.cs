@@ -29,6 +29,8 @@ namespace QuanLyThucTap.Areas.SinhVien.Controllers
                     .ThenInclude(p => p.GiangVien)
                 .Include(s => s.DanhSachPhanCong)
                     .ThenInclude(p => p.DeCuongThucTap)
+                .Include(s => s.DanhSachPhanCong)
+                    .ThenInclude(p => p.DotThucTap)
                 .FirstOrDefaultAsync(s => s.Mssv == username);
 
             if (sinhVien == null) return NotFound();
@@ -42,12 +44,87 @@ namespace QuanLyThucTap.Areas.SinhVien.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SaveDinhKy(BaoCaoDinhKy model)
+        public async Task<IActionResult> SaveDinhKy(BaoCaoDinhKy model, IFormFile? filePdf, string? linkDrive)
         {
             if (model.PhanCongId == 0 || model.KyThu <= 0)
             {
                 TempData["Error"] = "Dữ liệu kỳ báo cáo không hợp lệ.";
                 return RedirectToAction(nameof(DinhKy));
+            }
+
+            var phanCong = await _context.PhanCongHuongDans
+                .Include(p => p.DotThucTap)
+                .FirstOrDefaultAsync(p => p.Id == model.PhanCongId);
+
+            if (phanCong == null)
+            {
+                TempData["Error"] = "Không tìm thấy thông tin phân công hướng dẫn.";
+                return RedirectToAction(nameof(DinhKy));
+            }
+
+            // Kiểm tra số ngày làm việc: chu kỳ tháng tối đa 31 ngày, chu kỳ tuần tối đa 7 ngày, không âm
+            bool isThang = phanCong.LoaiChuKyBaoCao == "theo_thang";
+            int maxNgayLam = isThang ? 31 : 7;
+            if (model.SoNgayLamViec < 0 || model.SoNgayLamViec > maxNgayLam)
+            {
+                TempData["Error"] = $"Số ngày làm việc không hợp lệ (phải từ 0 đến {maxNgayLam} ngày đối với chu kỳ {(isThang ? "tháng" : "tuần")}).";
+                return RedirectToAction(nameof(DinhKy));
+            }
+
+            // Tự động tính toán ngày bắt đầu và ngày kết thúc chuẩn theo Đợt thực tập và Chu kỳ (không phụ thuộc client)
+            DateTime dotStart = phanCong.DotThucTap?.NgayBatDau ?? (model.NgayBatDau != default ? model.NgayBatDau : DateTime.Today);
+            DateTime dotEnd = phanCong.DotThucTap?.NgayKetThuc ?? dotStart.AddMonths(phanCong.SoThangThucTap > 0 ? phanCong.SoThangThucTap : 3);
+            int soThang = phanCong.SoThangThucTap > 0 ? phanCong.SoThangThucTap : 3;
+            int soKy = isThang ? soThang : soThang * 4;
+
+            DateTime startDate;
+            DateTime endDate;
+            if (isThang)
+            {
+                startDate = dotStart.AddMonths(model.KyThu - 1);
+                endDate = dotStart.AddMonths(model.KyThu).AddDays(-1);
+            }
+            else
+            {
+                startDate = dotStart.AddDays((model.KyThu - 1) * 7);
+                endDate = dotStart.AddDays(model.KyThu * 7 - 1);
+            }
+            if (model.KyThu >= soKy || endDate > dotEnd)
+            {
+                endDate = dotEnd;
+            }
+            if (startDate > endDate)
+            {
+                startDate = dotEnd;
+            }
+
+            model.NgayBatDau = startDate;
+            model.NgayKetThuc = endDate;
+
+            // Xử lý upload file PDF (nếu có)
+            string? uploadedFileUrl = null;
+            if (filePdf != null && filePdf.Length > 0)
+            {
+                var ext = Path.GetExtension(filePdf.FileName).ToLowerInvariant();
+                if (ext != ".pdf")
+                {
+                    TempData["Error"] = "Chỉ chấp nhận file đính kèm định dạng PDF (.pdf).";
+                    return RedirectToAction(nameof(DinhKy));
+                }
+
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "baocao");
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                var username = User.FindFirst("Username")?.Value ?? "SV";
+                var fileName = $"BaoCao_Ky{model.KyThu}_{username}_{DateTime.UtcNow.Ticks}.pdf";
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await filePdf.CopyToAsync(stream);
+                }
+
+                uploadedFileUrl = $"/uploads/baocao/{fileName}";
             }
 
             var existing = await _context.BaoCaoDinhKies
@@ -59,16 +136,32 @@ namespace QuanLyThucTap.Areas.SinhVien.Controllers
                 model.NgayNop = DateTime.UtcNow;
                 model.CreatedAt = DateTime.UtcNow;
                 model.UpdatedAt = DateTime.UtcNow;
+                if (!string.IsNullOrEmpty(uploadedFileUrl))
+                {
+                    model.FileBaoCaoUrl = uploadedFileUrl;
+                }
+                if (!string.IsNullOrWhiteSpace(linkDrive))
+                {
+                    model.LinkDrive = linkDrive.Trim();
+                }
                 _context.BaoCaoDinhKies.Add(model);
             }
             else
             {
-                existing.NgayBatDau = model.NgayBatDau;
-                existing.NgayKetThuc = model.NgayKetThuc;
+                existing.NgayBatDau = startDate;
+                existing.NgayKetThuc = endDate;
                 existing.SoNgayLamViec = model.SoNgayLamViec;
                 existing.CongViecHoanThanh = model.CongViecHoanThanh;
                 existing.KienThucHocDuoc = model.KienThucHocDuoc;
                 existing.KhoKhanVuongMac = model.KhoKhanVuongMac;
+                if (!string.IsNullOrEmpty(uploadedFileUrl))
+                {
+                    existing.FileBaoCaoUrl = uploadedFileUrl;
+                }
+                if (!string.IsNullOrWhiteSpace(linkDrive))
+                {
+                    existing.LinkDrive = linkDrive.Trim();
+                }
                 existing.NgayNop = DateTime.UtcNow;
                 existing.TrangThai = "da_nop";
                 existing.UpdatedAt = DateTime.UtcNow;

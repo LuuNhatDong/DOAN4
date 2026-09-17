@@ -119,6 +119,15 @@ using (var scope = app.Services.CreateScope())
             cmd07.ExecuteNonQuery();
             Console.WriteLine("--> [DATABASE] Da chay migration 07: ThS. Nguyen Thuy Anh & Du lieu theo doi tien do!");
         }
+
+        var migrationFile08 = Path.Combine(app.Environment.ContentRootPath, "supabase", "migrations", "08_add_file_and_drive_to_bao_cao_dinh_ky.sql");
+        if (File.Exists(migrationFile08))
+        {
+            using var cmd08 = conn.CreateCommand();
+            cmd08.CommandText = File.ReadAllText(migrationFile08);
+            cmd08.ExecuteNonQuery();
+            Console.WriteLine("--> [DATABASE] Da chay migration 08: Bo sung file_bao_cao_url va link_drive vao bao_cao_dinh_ky!");
+        }
     }
     catch (Exception ex)
     {

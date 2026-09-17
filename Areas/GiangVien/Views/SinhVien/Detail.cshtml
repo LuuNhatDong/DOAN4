@@ -173,6 +173,8 @@
             int soThang = Model.SoThangThucTap > 0 ? Model.SoThangThucTap : 3;
             int soKy = isThang ? soThang : soThang * 4;
             string tenKy = isThang ? "Tháng" : "Tuần";
+            DateTime dotStart = Model.DotThucTap?.NgayBatDau ?? DateTime.Today;
+            DateTime dotEnd = Model.DotThucTap?.NgayKetThuc ?? dotStart.AddMonths(soThang);
         }
         <div>
             <h5 class="fw-bold mb-0">
@@ -192,6 +194,17 @@
             @for (int i = 1; i <= soKy; i++)
             {
                 var bc = Model.DanhSachBaoCaoDinhKy.FirstOrDefault(b => b.KyThu == i);
+                DateTime kStart = isThang ? dotStart.AddMonths(i - 1) : dotStart.AddDays((i - 1) * 7);
+                DateTime kEnd = isThang ? dotStart.AddMonths(i).AddDays(-1) : dotStart.AddDays(i * 7 - 1);
+                if (i == soKy || kEnd > dotEnd)
+                {
+                    kEnd = dotEnd;
+                }
+                if (kStart > kEnd)
+                {
+                    kStart = kEnd;
+                }
+
                 <div class="@(isThang ? "col-md-4" : "col-md-3 col-sm-6")">
                     <div class="card h-100 shadow-sm border-0 @(bc != null ? (bc.TrangThai == "da_cham" ? "border-top border-4 border-success" : "border-top border-4 border-warning") : "border-top border-4 border-secondary")">
                         <div class="card-body p-3 d-flex flex-column">
@@ -221,6 +234,24 @@
                                     <span class="d-block mt-0.5"><i class="bi bi-clock-history me-1"></i>Số ngày: @bc.SoNgayLamViec ngày</span>
                                 </div>
 
+                                @if (!string.IsNullOrEmpty(bc.FileBaoCaoUrl) || !string.IsNullOrEmpty(bc.LinkDrive))
+                                {
+                                    <div class="d-flex gap-1 flex-wrap mb-2">
+                                        @if (!string.IsNullOrEmpty(bc.FileBaoCaoUrl))
+                                        {
+                                            <a href="@bc.FileBaoCaoUrl" target="_blank" class="badge bg-danger bg-opacity-10 text-danger border border-danger text-decoration-none py-1 px-2" title="Xem file PDF">
+                                                <i class="bi bi-file-earmark-pdf me-1"></i>PDF
+                                            </a>
+                                        }
+                                        @if (!string.IsNullOrEmpty(bc.LinkDrive))
+                                        {
+                                            <a href="@bc.LinkDrive" target="_blank" class="badge bg-primary bg-opacity-10 text-primary border border-primary text-decoration-none py-1 px-2" title="Mở link Google Drive">
+                                                <i class="bi bi-google me-1"></i>Drive
+                                            </a>
+                                        }
+                                    </div>
+                                }
+
                                 <div class="mb-3 flex-grow-1">
                                     <div class="small fw-semibold text-dark mb-1">Công việc đã làm:</div>
                                     <p class="small text-muted mb-0 text-truncate-2" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
@@ -248,6 +279,9 @@
                             }
                             else
                             {
+                                <div class="small text-muted mb-2">
+                                    <i class="bi bi-calendar-range me-1"></i>@kStart.ToString("dd/MM") - @kEnd.ToString("dd/MM/yyyy")
+                                </div>
                                 <div class="my-auto py-3 text-center text-muted">
                                     <i class="bi bi-dash-circle fs-3 text-secondary opacity-50 d-block mb-1"></i>
                                     <span class="small">Sinh viên chưa gửi báo cáo cho @tenKy.ToLower() này</span>
@@ -274,12 +308,36 @@
                                     <div class="modal-body">
                                         <div class="alert alert-light border small mb-3">
                                             <strong>Thời gian:</strong> @bc.NgayBatDau.ToString("dd/MM/yyyy") đến @bc.NgayKetThuc.ToString("dd/MM/yyyy") (@bc.SoNgayLamViec ngày làm việc)<br />
-                                            <strong>Công việc đã làm:</strong> @bc.CongViecHoanThanh<br />
-                                            <strong>Kiến thức mới:</strong> @bc.KienThucHocDuoc
-                                            @if (!string.IsNullOrEmpty(bc.KhoKhanVuongMac))
+
+                                            @if (!string.IsNullOrEmpty(bc.FileBaoCaoUrl) || !string.IsNullOrEmpty(bc.LinkDrive))
                                             {
-                                                <br /><strong>Khó khăn:</strong> @bc.KhoKhanVuongMac
+                                                <div class="mt-2 pt-2 border-top">
+                                                    <strong class="d-block mb-1">Tài liệu đính kèm từ sinh viên:</strong>
+                                                    <div class="d-flex gap-2 flex-wrap">
+                                                        @if (!string.IsNullOrEmpty(bc.FileBaoCaoUrl))
+                                                        {
+                                                            <a href="@bc.FileBaoCaoUrl" target="_blank" class="btn btn-sm btn-outline-danger">
+                                                                <i class="bi bi-file-earmark-pdf me-1"></i> Xem File PDF
+                                                            </a>
+                                                        }
+                                                        @if (!string.IsNullOrEmpty(bc.LinkDrive))
+                                                        {
+                                                            <a href="@bc.LinkDrive" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                                <i class="bi bi-google me-1"></i> Mở Google Drive
+                                                            </a>
+                                                        }
+                                                    </div>
+                                                </div>
                                             }
+
+                                            <div class="mt-2 pt-2 border-top">
+                                                <strong>Công việc đã làm:</strong> @bc.CongViecHoanThanh<br />
+                                                <strong>Kiến thức mới:</strong> @bc.KienThucHocDuoc
+                                                @if (!string.IsNullOrEmpty(bc.KhoKhanVuongMac))
+                                                {
+                                                    <br /><strong>Khó khăn:</strong> @bc.KhoKhanVuongMac
+                                                }
+                                            </div>
                                         </div>
 
                                         <div class="mb-3">
