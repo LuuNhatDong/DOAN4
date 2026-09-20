@@ -275,8 +275,10 @@ namespace QuanLyThucTap.Controllers
             return RedirectToAction("Login", "Account");
         }
 
-        public IActionResult AccessDenied()
+        [HttpGet]
+        public IActionResult AccessDenied(string? returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
     }

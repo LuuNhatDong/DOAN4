@@ -21,6 +21,20 @@
             font-family: system-ui, -apple-system, sans-serif;
             padding: 1.5rem;
         }
+        @@media (max-width: 576px) {
+            body {
+                padding: 0.75rem 0.5rem;
+            }
+            .login-header {
+                padding: 1.5rem 1rem 1.25rem 1rem !important;
+            }
+            .login-header h4 {
+                font-size: 1.15rem;
+            }
+            .form-control {
+                font-size: 16px !important; /* Ngăn iOS tự động phóng to màn hình khi nhập */
+            }
+        }
         .login-card {
             width: 100%;
             max-width: 480px;
@@ -37,8 +51,12 @@
         }
         .demo-btn {
             font-size: 0.75rem;
-            padding: 0.35rem 0.6rem;
+            padding: 0.4rem 0.65rem;
             border-radius: 0.375rem;
+            min-height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
@@ -51,7 +69,7 @@
             <div class="text-white-50 mt-1" style="font-size: 0.72rem;">Hệ thống thông tin • Công nghệ thông tin • Khoa học máy tính • Kỹ thuật phần mềm</div>
         </div>
 
-        <div class="p-4">
+        <div class="p-3 p-sm-4">
             @if (ViewBag.Error != null)
             {
                 <div class="alert alert-danger d-flex align-items-center gap-2 small py-2 mb-3" role="alert">

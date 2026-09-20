@@ -11,8 +11,8 @@
 
 <div class="row justify-content-center">
     <div class="col-lg-9">
-        <div class="card p-4 shadow-sm">
-            <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="card p-3 p-sm-4 shadow-sm">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2 mb-3">
                 <div>
                     <h4 class="fw-bold mb-1">
                         <i class="bi bi-building-check text-primary me-2"></i>
@@ -22,32 +22,32 @@
                 </div>
                 @if (Model != null)
                 {
-                    @switch (Model.TrangThaiDuyet)
-                    {
-                        case "dang_thuc_tap":
-                            <span class="badge bg-success px-3 py-2 fs-7 rounded-pill">
-                                <i class="bi bi-check-circle-fill me-1"></i> GVHD đã tiếp nhận
-                            </span>
-                            break;
-                        case "cho_gv_duyet":
-                            <span class="badge bg-warning text-dark px-3 py-2 fs-7 rounded-pill">
-                                <i class="bi bi-hourglass-split me-1"></i> Chờ GVHD xác nhận
-                            </span>
-                            break;
-                        case "gv_tu_choi":
-                            <span class="badge bg-danger px-3 py-2 fs-7 rounded-pill">
-                                <i class="bi bi-x-circle me-1"></i> GVHD đã từ chối
-                            </span>
-                            break;
-                        case "hoan_thanh":
-                            <span class="badge bg-primary px-3 py-2 fs-7 rounded-pill">Đã hoàn thành</span>
-                            break;
-                        default:
-                            <span class="badge bg-secondary px-3 py-2 fs-7 rounded-pill">
-                                <i class="bi bi-file-earmark-plus me-1"></i> Chưa gửi yêu cầu
-                            </span>
-                            break;
-                    }
+                    <div class="mt-1 mt-md-0">
+                        @switch (Model.TrangThaiDuyet)
+                        {
+                            case "dang_thuc_tap":
+                                <span class="badge bg-success px-3 py-2 fs-7 rounded-pill">
+                                    <i class="bi bi-check-circle-fill me-1"></i> GVHD đã tiếp nhận
+                                </span>
+                                break;
+                            case "cho_gv_duyet":
+                                <span class="badge bg-warning text-dark px-3 py-2 fs-7 rounded-pill">
+                                    <i class="bi bi-hourglass-split me-1"></i> Chờ GVHD xác nhận
+                                </span>
+                                break;
+                            case "gv_tu_choi":
+                                <span class="badge bg-danger px-3 py-2 fs-7 rounded-pill">
+                                    <i class="bi bi-x-circle me-1"></i> GVHD đã từ chối
+                                </span>
+                                break;
+                            case "hoan_thanh":
+                                <span class="badge bg-primary px-3 py-2 fs-7 rounded-pill">Đã hoàn thành</span>
+                                break;
+                            default:
+                                <span class="badge bg-secondary px-3 py-2 fs-7 rounded-pill">@Model.TrangThaiDuyet</span>
+                                break;
+                        }
+                    </div>
                 }
             </div>
 

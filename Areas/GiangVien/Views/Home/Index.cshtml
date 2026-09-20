@@ -4,7 +4,7 @@
     var gv = ViewBag.GiangVien as QuanLyThucTap.Models.GiangVien;
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-4">
     <div>
         <h4 class="fw-bold mb-1">Chào mừng, @gv?.Hovaten</h4>
         <p class="text-muted small mb-0">Học vị: @gv?.HocVi - Bộ môn: @gv?.BoMon</p>
@@ -12,7 +12,7 @@
 </div>
 
 <div class="row g-3 mb-4">
-    <div class="col-sm-4">
+    <div class="col-12 col-sm-4">
         <div class="card p-3 h-100">
             <div class="d-flex align-items-center gap-3">
                 <div class="p-3 bg-primary bg-opacity-10 text-primary rounded-3 fs-3">
@@ -25,7 +25,7 @@
             </div>
         </div>
     </div>
-    <div class="col-sm-4">
+    <div class="col-12 col-sm-4">
         <div class="card p-3 h-100">
             <div class="d-flex align-items-center gap-3">
                 <div class="p-3 bg-warning bg-opacity-10 text-warning rounded-3 fs-3">
@@ -38,7 +38,7 @@
             </div>
         </div>
     </div>
-    <div class="col-sm-4">
+    <div class="col-12 col-sm-4">
         <div class="card p-3 h-100">
             <div class="d-flex align-items-center gap-3">
                 <div class="p-3 bg-success bg-opacity-10 text-success rounded-3 fs-3">
@@ -61,14 +61,14 @@
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light">
                 <tr>
-                    <th>MSSV</th>
-                    <th>Họ và Tên</th>
-                    <th>Lớp</th>
-                    <th>Nơi thực tập</th>
-                    <th>Chu kỳ nộp bài</th>
-                    <th>Đề cương</th>
-                    <th>Trạng thái</th>
-                    <th class="text-end">Chi tiết & Chấm điểm</th>
+                    <th style="min-width: 100px; white-space: nowrap;">MSSV</th>
+                    <th style="min-width: 150px;">Họ và Tên</th>
+                    <th style="min-width: 95px; white-space: nowrap;">Lớp</th>
+                    <th style="min-width: 190px;">Nơi thực tập</th>
+                    <th style="min-width: 130px; white-space: nowrap;">Chu kỳ nộp bài</th>
+                    <th style="min-width: 110px; white-space: nowrap;">Đề cương</th>
+                    <th style="min-width: 125px; white-space: nowrap;">Trạng thái</th>
+                    <th class="text-end" style="min-width: 175px; white-space: nowrap;">Chi tiết & Chấm điểm</th>
                 </tr>
             </thead>
             <tbody>
@@ -81,10 +81,10 @@
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td class="fw-bold text-primary">@item.SinhVien?.Mssv</td>
-                        <td class="fw-semibold">@item.SinhVien?.Hovaten</td>
+                        <td class="fw-bold text-primary" style="white-space: nowrap;">@item.SinhVien?.Mssv</td>
+                        <td class="fw-semibold" style="min-width: 150px; white-space: normal;">@item.SinhVien?.Hovaten</td>
                         <td><span class="badge bg-light text-dark border">@item.SinhVien?.Lop</span></td>
-                        <td>
+                        <td style="min-width: 190px; white-space: normal;">
                             @if (item.DoanhNghiep != null)
                             {
                                 <span>@item.DoanhNghiep.TenVietTat</span>
@@ -94,12 +94,12 @@
                                 <span>@(item.TenCtyNgoai ?? "---")</span>
                             }
                         </td>
-                        <td>
+                        <td style="white-space: nowrap;">
                             <span class="badge bg-light text-secondary border">
                                 @(item.LoaiChuKyBaoCao == "theo_tuan" ? "Theo tuần" : "Theo tháng")
                             </span>
                         </td>
-                        <td>
+                        <td style="white-space: nowrap;">
                             @if (item.DeCuongThucTap == null)
                             {
                                 <span class="badge bg-secondary">Chưa nộp</span>
@@ -117,7 +117,7 @@
                                 <span class="badge bg-danger">Yêu cầu sửa</span>
                             }
                         </td>
-                        <td>
+                        <td style="white-space: nowrap;">
                             @switch (item.TrangThaiDuyet)
                             {
                                 case "dang_thuc_tap":
@@ -131,10 +131,10 @@
                                     break;
                             }
                         </td>
-                        <td class="text-end">
+                        <td class="text-end" style="white-space: nowrap;">
                             <a asp-controller="SinhVien" asp-action="Detail" asp-route-phanCongId="@item.Id" 
-                               class="btn btn-sm btn-primary">
-                                <i class="bi bi-box-arrow-up-right me-1"></i> Quản lý & Chấm điểm
+                               class="btn btn-sm btn-primary py-1 px-2.5 text-center d-inline-block shadow-sm" style="line-height: 1.3; font-size: 0.8rem; white-space: nowrap;">
+                                <i class="bi bi-box-arrow-up-right me-1"></i>Quản lý &amp;<br />Chấm điểm
                             </a>
                         </td>
                     </tr>

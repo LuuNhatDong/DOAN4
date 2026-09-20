@@ -6,7 +6,7 @@
     var kq = Model.DanhGiaKetQua;
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-4">
     <div>
         <a asp-action="Index" class="btn btn-sm btn-outline-secondary mb-2">
             <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
@@ -205,7 +205,7 @@
                     kStart = kEnd;
                 }
 
-                <div class="@(isThang ? "col-md-4" : "col-md-3 col-sm-6")">
+                <div class="@(isThang ? "col-12 col-md-4" : "col-12 col-sm-6 col-md-3")">
                     <div class="card h-100 shadow-sm border-0 @(bc != null ? (bc.TrangThai == "da_cham" ? "border-top border-4 border-success" : "border-top border-4 border-warning") : "border-top border-4 border-secondary")">
                         <div class="card-body p-3 d-flex flex-column">
                             <div class="d-flex justify-content-between align-items-start mb-2">
@@ -369,21 +369,83 @@
 </div>
 
 <!-- Phần 3: Báo cáo Tổng kết (Giữa kỳ & Cuối kỳ) -->
+<style>
+    @@media (min-width: 768px) {
+        .table-tongket .col-tieude {
+            white-space: nowrap !important;
+        }
+        .table-tongket .col-tomtat {
+            max-width: 250px !important;
+            white-space: normal !important;
+        }
+        .table-tongket .col-nhanxet {
+            max-width: 200px !important;
+            white-space: normal !important;
+        }
+    }
+    @@media (max-width: 767.98px) {
+        .table-tongket .col-loai {
+            min-width: 85px;
+            white-space: nowrap;
+        }
+        .table-tongket .col-tieude {
+            min-width: 180px;
+            white-space: normal;
+        }
+        .table-tongket .col-tomtat {
+            min-width: 260px;
+            white-space: normal;
+        }
+        .table-tongket .col-tailieu {
+            min-width: 170px;
+            white-space: nowrap;
+        }
+        .table-tongket .col-diem {
+            min-width: 75px;
+            white-space: nowrap;
+        }
+        .table-tongket .col-nhanxet {
+            min-width: 220px;
+            white-space: normal;
+        }
+        .table-tongket .col-chamdiem {
+            min-width: 95px;
+            white-space: nowrap;
+        }
+    }
+
+    /* Dark Mode cho nút GitHub */
+    [data-bs-theme="dark"] .btn-outline-dark {
+        color: #ffffff !important;
+        border-color: #64748b !important;
+    }
+    [data-bs-theme="dark"] .btn-outline-dark:hover {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+        border-color: #ffffff !important;
+    }
+    [data-bs-theme="dark"] .btn-outline-dark .bi-github {
+        color: #ffffff !important;
+    }
+    [data-bs-theme="dark"] .btn-outline-dark:hover .bi-github {
+        color: #0f172a !important;
+    }
+</style>
 <div class="card mb-4 overflow-hidden">
     <div class="card-header bg-white py-3">
         <h5 class="fw-bold mb-0"><i class="bi bi-file-earmark-pdf text-primary me-2"></i>Báo Cáo Tổng Kết (Giữa kỳ & Cuối kỳ)</h5>
     </div>
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
+        <table class="table table-hover align-middle mb-0 table-tongket">
             <thead class="table-light">
                 <tr>
-                    <th>Loại</th>
-                    <th>Tiêu đề báo cáo</th>
-                    <th>Tóm tắt kết quả</th>
-                    <th>Tài liệu PDF & Source Code</th>
-                    <th>Điểm</th>
-                    <th>Nhận xét GVHD</th>
-                    <th class="text-end">Chấm điểm</th>
+                    <th class="col-loai">Loại</th>
+                    <th class="col-tieude">Tiêu đề báo cáo</th>
+                    <th class="col-tomtat">Tóm tắt kết quả</th>
+                    <th class="col-tailieu">Tài liệu PDF & Source Code</th>
+                    <th class="text-center col-diem">Điểm</th>
+                    <th class="col-nhanxet">Nhận xét GVHD</th>
+                    <th class="text-end col-chamdiem">Chấm điểm</th>
                 </tr>
             </thead>
             <tbody>
@@ -396,14 +458,14 @@
                 @foreach (var tk in Model.DanhSachBaoCaoTongKet)
                 {
                     <tr>
-                        <td>
+                        <td class="col-loai">
                             <span class="badge @(tk.LoaiBaoCao == "giua_ky" ? "bg-info" : "bg-primary")">
                                 @(tk.LoaiBaoCao == "giua_ky" ? "Giữa kỳ" : "Cuối kỳ")
                             </span>
                         </td>
-                        <td class="fw-bold">@tk.TieuDe</td>
-                        <td class="small" style="max-width: 250px;">@tk.TomTat</td>
-                        <td>
+                        <td class="fw-bold col-tieude">@tk.TieuDe</td>
+                        <td class="small col-tomtat">@tk.TomTat</td>
+                        <td class="col-tailieu">
                             <a href="@tk.FileBaoCaoUrl" target="_blank" class="btn btn-sm btn-outline-danger me-1">
                                 <i class="bi bi-file-earmark-pdf"></i> Xem PDF
                             </a>
@@ -414,11 +476,11 @@
                                 </a>
                             }
                         </td>
-                        <td class="fw-bold fs-6 text-primary">
+                        <td class="text-center fw-bold fs-6 text-primary col-diem">
                             @(tk.DiemSo.HasValue ? tk.DiemSo.Value.ToString("0.0") : "---")
                         </td>
-                        <td class="small text-muted">@(tk.NhanXetGvhd ?? "Chưa có nhận xét")</td>
-                        <td class="text-end">
+                        <td class="small text-muted col-nhanxet">@(tk.NhanXetGvhd ?? "Chưa có nhận xét")</td>
+                        <td class="text-end col-chamdiem">
                             <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalChamDiemTongKet_@tk.Id">
                                 <i class="bi bi-pencil me-1"></i> Chấm
                             </button>
@@ -484,25 +546,25 @@
         @Html.AntiForgeryToken()
         <input type="hidden" name="phanCongId" value="@Model.Id" />
 
-        <div class="col-md-3">
+        <div class="col-6 col-md-3">
             <label class="form-label small fw-semibold">1. Điểm định kỳ (20%) *</label>
             <input type="number" step="0.1" min="0" max="10" name="diemDinhKy" class="form-control" 
                    value="@(kq?.DiemDinhKy ?? 9.5m)" required />
         </div>
 
-        <div class="col-md-3">
+        <div class="col-6 col-md-3">
             <label class="form-label small fw-semibold">2. Điểm giữa kỳ (20%) *</label>
             <input type="number" step="0.1" min="0" max="10" name="diemGiuaKy" class="form-control" 
                    value="@(kq?.DiemGiuaKy ?? 9.0m)" required />
         </div>
 
-        <div class="col-md-3">
+        <div class="col-6 col-md-3">
             <label class="form-label small fw-semibold">3. Điểm cuối kỳ (30%) *</label>
             <input type="number" step="0.1" min="0" max="10" name="diemCuoiKy" class="form-control" 
                    value="@(kq?.DiemCuoiKy ?? 9.5m)" required />
         </div>
 
-        <div class="col-md-3">
+        <div class="col-6 col-md-3">
             <label class="form-label small fw-semibold">4. Doanh nghiệp đánh giá (30%) *</label>
             <input type="number" step="0.1" min="0" max="10" name="diemDoanhNghiep" class="form-control" 
                    value="@(kq?.DiemDoanhNghiep ?? 9.5m)" required />

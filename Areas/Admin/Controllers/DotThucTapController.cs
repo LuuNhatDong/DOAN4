@@ -146,7 +146,7 @@ namespace QuanLyThucTap.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ChiTiet(long id)
+        public async Task<IActionResult> ChiTiet(long id, int page = 1)
         {
             var dot = await _context.DotThucTaps
                 .Include(d => d.DanhSachPhanCong)
@@ -158,6 +158,29 @@ namespace QuanLyThucTap.Areas.Admin.Controllers
                 .FirstOrDefaultAsync(d => d.Id == id);
 
             if (dot == null) return NotFound();
+
+            // Lấy toàn bộ danh sách phân công hợp lệ trong đợt
+            var allPhanCongs = dot.DanhSachPhanCong
+                .Where(p => p.SinhVien != null && p.SinhVien.TrangThai == "hoat_dong")
+                .OrderBy(p => p.SinhVien!.Mssv)
+                .ToList();
+
+            // Phân trang 10 sinh viên / trang
+            int pageSize = 10;
+            int totalItems = allPhanCongs.Count;
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            page = Math.Max(1, Math.Min(page, Math.Max(1, totalPages)));
+
+            var pagedPhanCongs = allPhanCongs
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            ViewBag.AllPhanCongs = allPhanCongs;
+            ViewBag.PagedPhanCongs = pagedPhanCongs;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.TotalItems = totalItems;
 
             return View(dot);
         }

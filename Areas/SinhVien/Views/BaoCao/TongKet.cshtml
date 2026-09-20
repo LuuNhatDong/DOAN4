@@ -5,7 +5,7 @@
     bool coYeuCauGiuaKy = pc?.YeuCauBaoCaoGiuaKy ?? true;
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-4">
     <div>
         <h4 class="fw-bold mb-1">Nộp Báo Cáo Tổng Kết (Giữa kỳ / Cuối kỳ)</h4>
         <p class="text-muted small mb-0">Tải lên file báo cáo PDF và đính kèm mã nguồn dự án (GitHub)</p>
@@ -86,19 +86,85 @@
     </div>
 </div>
 
+<style>
+    /* Desktop (>= 768px): Khôi phục 100% giao diện cũ (Tiêu đề 1 dòng, Tóm tắt 3 dòng) */
+    @@media (min-width: 768px) {
+        .table-tongket .col-tieude {
+            white-space: nowrap !important;
+        }
+        .table-tongket .col-tomtat {
+            max-width: 250px !important;
+            white-space: normal !important;
+        }
+        .table-tongket .col-nhanxet {
+            max-width: 200px !important;
+            white-space: normal !important;
+        }
+    }
+
+    /* Mobile (< 768px): Chỉ kéo ngang mở rộng trên di động để các cột dài từ 2 đến 3 dòng */
+    @@media (max-width: 767.98px) {
+        .table-tongket .col-loai {
+            min-width: 85px;
+            white-space: nowrap;
+        }
+        .table-tongket .col-tieude {
+            min-width: 180px;
+            white-space: normal;
+        }
+        .table-tongket .col-tomtat {
+            min-width: 260px;
+            white-space: normal;
+        }
+        .table-tongket .col-pdf {
+            min-width: 105px;
+            white-space: nowrap;
+        }
+        .table-tongket .col-github {
+            min-width: 100px;
+            white-space: nowrap;
+        }
+        .table-tongket .col-diem {
+            min-width: 75px;
+            white-space: nowrap;
+        }
+        .table-tongket .col-nhanxet {
+            min-width: 220px;
+            white-space: normal;
+        }
+    }
+
+    /* Dark Mode cho nút GitHub */
+    [data-bs-theme="dark"] .btn-outline-dark {
+        color: #ffffff !important;
+        border-color: #64748b !important;
+    }
+    [data-bs-theme="dark"] .btn-outline-dark:hover {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+        border-color: #ffffff !important;
+    }
+    [data-bs-theme="dark"] .btn-outline-dark .bi-github {
+        color: #ffffff !important;
+    }
+    [data-bs-theme="dark"] .btn-outline-dark:hover .bi-github {
+        color: #0f172a !important;
+    }
+</style>
+
 <!-- Danh sách báo cáo đã nộp -->
 <div class="card overflow-hidden">
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
+        <table class="table table-hover align-middle mb-0 table-tongket">
             <thead class="table-light">
                 <tr>
-                    <th>Loại</th>
-                    <th>Tiêu đề báo cáo</th>
-                    <th>Tóm tắt kết quả</th>
-                    <th>File PDF</th>
-                    <th>Link GitHub</th>
-                    <th>Điểm</th>
-                    <th>Nhận xét GVHD</th>
+                    <th class="col-loai">Loại</th>
+                    <th class="col-tieude">Tiêu đề báo cáo</th>
+                    <th class="col-tomtat">Tóm tắt kết quả</th>
+                    <th class="col-pdf">File PDF</th>
+                    <th class="col-github">Link GitHub</th>
+                    <th class="text-center col-diem">Điểm</th>
+                    <th class="col-nhanxet">Nhận xét GVHD</th>
                 </tr>
             </thead>
             <tbody>
@@ -111,19 +177,19 @@
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td>
+                        <td class="col-loai">
                             <span class="badge @(item.LoaiBaoCao == "giua_ky" ? "bg-info" : "bg-primary")">
                                 @(item.LoaiBaoCao == "giua_ky" ? "Giữa kỳ" : "Cuối kỳ")
                             </span>
                         </td>
-                        <td class="fw-bold">@item.TieuDe</td>
-                        <td class="small" style="max-width: 250px;">@item.TomTat</td>
-                        <td>
+                        <td class="fw-bold col-tieude">@item.TieuDe</td>
+                        <td class="small col-tomtat">@item.TomTat</td>
+                        <td class="col-pdf">
                             <a href="@item.FileBaoCaoUrl" target="_blank" class="btn btn-sm btn-outline-danger">
                                 <i class="bi bi-file-earmark-pdf me-1"></i> Xem PDF
                             </a>
                         </td>
-                        <td>
+                        <td class="col-github">
                             @if (!string.IsNullOrEmpty(item.LinkGithub))
                             {
                                 <a href="@item.LinkGithub" target="_blank" class="btn btn-sm btn-outline-dark">
@@ -135,10 +201,10 @@
                                 <span class="text-muted small">---</span>
                             }
                         </td>
-                        <td class="fw-bold fs-6 text-primary">
+                        <td class="text-center fw-bold fs-6 text-primary col-diem">
                             @(item.DiemSo.HasValue ? item.DiemSo.Value.ToString("0.0") : "Chờ chấm")
                         </td>
-                        <td class="small text-muted" style="max-width: 200px;">
+                        <td class="small text-muted col-nhanxet">
                             @(item.NhanXetGvhd ?? "---")
                         </td>
                     </tr>

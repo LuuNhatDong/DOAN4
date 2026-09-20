@@ -6,7 +6,7 @@
     var danhSachGv = ViewBag.DanhSachGiangVien as List<QuanLyThucTap.Models.GiangVien> ?? new List<QuanLyThucTap.Models.GiangVien>();
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-4">
     <div>
         <h4 class="fw-bold mb-1">Quản Lý Sinh Viên Thực Tập & Phân Công GVHD</h4>
         <p class="text-muted small mb-0">
@@ -73,13 +73,13 @@
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light">
                 <tr>
-                    <th>MSSV</th>
-                    <th>Họ và Tên</th>
-                    <th>Lớp & Ngành</th>
-                    <th>Nơi Thực Tập</th>
-                    <th>Vị trí</th>
-                    <th>Giảng Viên Hướng Dẫn</th>
-                    <th class="text-end">Phân công / Thao tác</th>
+                    <th style="min-width: 105px; white-space: nowrap;">MSSV</th>
+                    <th style="min-width: 145px;">Họ và Tên</th>
+                    <th style="min-width: 135px; white-space: nowrap;">Lớp & Ngành</th>
+                    <th style="min-width: 170px; max-width: 250px;">Nơi Thực Tập</th>
+                    <th style="min-width: 135px; max-width: 170px;">Vị trí</th>
+                    <th style="min-width: 150px; white-space: nowrap;">Giảng Viên Hướng Dẫn</th>
+                    <th class="text-end" style="min-width: 150px; white-space: nowrap;">Phân công / Thao tác</th>
                 </tr>
             </thead>
             <tbody>
@@ -93,17 +93,17 @@
                 {
                     var pc = item.DanhSachPhanCong.FirstOrDefault(p => p.DotThucTapId == dotId);
                     <tr>
-                        <td class="fw-bold text-primary">@item.Mssv</td>
-                        <td class="fw-semibold">
+                        <td class="fw-bold text-primary" style="white-space: nowrap;">@item.Mssv</td>
+                        <td class="fw-semibold" style="min-width: 145px; white-space: normal;">
                             @item.Hovaten
-                            <small class="text-muted d-block">@item.Email</small>
+                            <small class="text-muted d-block text-truncate" style="max-width: 140px;">@item.Email</small>
                         </td>
-                        <td>
+                        <td style="min-width: 135px;">
                             <span class="badge bg-light text-dark border">@item.Lop</span>
-                            <small class="text-muted d-block">@item.ChuyenNganh</small>
+                            <small class="text-muted d-block" style="white-space: nowrap;">@item.ChuyenNganh</small>
                         </td>
-                        <td>
-                            <strong class="text-dark">@(pc?.DoanhNghiep?.TenDoanhNghiep ?? pc?.TenCtyNgoai ?? "Doanh nghiệp CNTT thực tập")</strong>
+                        <td style="min-width: 170px; max-width: 250px; white-space: normal;">
+                            <strong class="text-dark d-block">@(pc?.DoanhNghiep?.TenDoanhNghiep ?? pc?.TenCtyNgoai ?? "Doanh nghiệp CNTT thực tập")</strong>
                             <small class="text-muted d-block">
                                 <i class="bi bi-clock-history me-1"></i>Thời gian: @(pc?.SoThangThucTap ?? 3) tháng
                                 @if (pc?.DotThucTap != null)
@@ -112,10 +112,10 @@
                                 }
                             </small>
                         </td>
-                        <td>
+                        <td style="min-width: 135px; max-width: 170px; white-space: normal;">
                             <span class="small text-secondary">@(pc?.ViTriThucTap ?? "Thực tập sinh IT")</span>
                         </td>
-                        <td>
+                        <td style="white-space: nowrap;">
                             @if (pc?.GiangVien != null)
                             {
                                 @if (pc.TrangThaiDuyet == "cho_gv_duyet")

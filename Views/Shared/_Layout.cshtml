@@ -38,6 +38,9 @@
             --primary-blue: #0b4ec2;
             --primary-blue-dark: #073a96;
         }
+        html, body {
+            overflow-x: hidden;
+        }
         body {
             font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: #f8fafc;
@@ -64,6 +67,10 @@
         }
         #page-content-wrapper {
             margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            max-width: calc(100% - var(--sidebar-width));
+            min-width: 0;
+            flex-grow: 1;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -235,11 +242,193 @@
             color: #94a3b8 !important;
             border-color: #1a2b4c !important;
         }
+        
+        /* Dark mode table contextual variants (table-primary, table-success, table-warning, table-danger, etc.) */
+        [data-bs-theme="dark"] .table-primary,
+        [data-bs-theme="dark"] .table > :not(caption) > .table-primary > *,
+        [data-bs-theme="dark"] .table-hover > tbody > tr.table-primary:hover > *,
+        [data-bs-theme="dark"] .table-hover > tbody > tr.table-primary > *,
+        [data-bs-theme="dark"] tr.table-primary td,
+        [data-bs-theme="dark"] tr.table-primary th {
+            --bs-table-bg: rgba(37, 99, 235, 0.16) !important;
+            --bs-table-accent-bg: transparent !important;
+            --bs-table-bg-type: transparent !important;
+            --bs-table-color: #f1f5f9 !important;
+            --bs-table-border-color: #1e3a8a !important;
+            --bs-table-hover-bg: rgba(37, 99, 235, 0.26) !important;
+            --bs-table-hover-color: #ffffff !important;
+            background-color: rgba(37, 99, 235, 0.16) !important;
+            box-shadow: none !important;
+            color: #f1f5f9 !important;
+        }
+
+        [data-bs-theme="dark"] .table-success,
+        [data-bs-theme="dark"] .table > :not(caption) > .table-success > *,
+        [data-bs-theme="dark"] .table-hover > tbody > tr.table-success:hover > *,
+        [data-bs-theme="dark"] .table-hover > tbody > tr.table-success > *,
+        [data-bs-theme="dark"] tr.table-success td,
+        [data-bs-theme="dark"] tr.table-success th {
+            --bs-table-bg: rgba(16, 185, 129, 0.16) !important;
+            --bs-table-accent-bg: transparent !important;
+            --bs-table-bg-type: transparent !important;
+            --bs-table-color: #f1f5f9 !important;
+            --bs-table-border-color: #065f46 !important;
+            --bs-table-hover-bg: rgba(16, 185, 129, 0.26) !important;
+            --bs-table-hover-color: #ffffff !important;
+            background-color: rgba(16, 185, 129, 0.16) !important;
+            box-shadow: none !important;
+            color: #f1f5f9 !important;
+        }
+
+        [data-bs-theme="dark"] .table-warning,
+        [data-bs-theme="dark"] .table > :not(caption) > .table-warning > *,
+        [data-bs-theme="dark"] .table-hover > tbody > tr.table-warning:hover > *,
+        [data-bs-theme="dark"] .table-hover > tbody > tr.table-warning > *,
+        [data-bs-theme="dark"] tr.table-warning td,
+        [data-bs-theme="dark"] tr.table-warning th {
+            --bs-table-bg: rgba(245, 158, 11, 0.16) !important;
+            --bs-table-accent-bg: transparent !important;
+            --bs-table-bg-type: transparent !important;
+            --bs-table-color: #f1f5f9 !important;
+            --bs-table-border-color: #78350f !important;
+            --bs-table-hover-bg: rgba(245, 158, 11, 0.26) !important;
+            --bs-table-hover-color: #ffffff !important;
+            background-color: rgba(245, 158, 11, 0.16) !important;
+            box-shadow: none !important;
+            color: #f1f5f9 !important;
+        }
+
+        [data-bs-theme="dark"] .table-danger,
+        [data-bs-theme="dark"] .table > :not(caption) > .table-danger > *,
+        [data-bs-theme="dark"] .table-hover > tbody > tr.table-danger:hover > *,
+        [data-bs-theme="dark"] .table-hover > tbody > tr.table-danger > *,
+        [data-bs-theme="dark"] tr.table-danger td,
+        [data-bs-theme="dark"] tr.table-danger th {
+            --bs-table-bg: rgba(239, 68, 68, 0.16) !important;
+            --bs-table-accent-bg: transparent !important;
+            --bs-table-bg-type: transparent !important;
+            --bs-table-color: #f1f5f9 !important;
+            --bs-table-border-color: #7f1d1d !important;
+            --bs-table-hover-bg: rgba(239, 68, 68, 0.26) !important;
+            --bs-table-hover-color: #ffffff !important;
+            background-color: rgba(239, 68, 68, 0.16) !important;
+            box-shadow: none !important;
+            color: #f1f5f9 !important;
+        }
+
+        [data-bs-theme="dark"] .table-info,
+        [data-bs-theme="dark"] .table > :not(caption) > .table-info > *,
+        [data-bs-theme="dark"] .table-hover > tbody > tr.table-info:hover > *,
+        [data-bs-theme="dark"] .table-hover > tbody > tr.table-info > *,
+        [data-bs-theme="dark"] tr.table-info td,
+        [data-bs-theme="dark"] tr.table-info th {
+            --bs-table-bg: rgba(6, 182, 212, 0.16) !important;
+            --bs-table-accent-bg: transparent !important;
+            --bs-table-bg-type: transparent !important;
+            --bs-table-color: #f1f5f9 !important;
+            --bs-table-border-color: #164e63 !important;
+            --bs-table-hover-bg: rgba(6, 182, 212, 0.26) !important;
+            --bs-table-hover-color: #ffffff !important;
+            background-color: rgba(6, 182, 212, 0.16) !important;
+            box-shadow: none !important;
+            color: #f1f5f9 !important;
+        }
+
+        [data-bs-theme="dark"] .table-active,
+        [data-bs-theme="dark"] .table > :not(caption) > .table-active > *,
+        [data-bs-theme="dark"] .table-hover > tbody > tr.table-active:hover > *,
+        [data-bs-theme="dark"] .table-hover > tbody > tr.table-active > *,
+        [data-bs-theme="dark"] tr.table-active td,
+        [data-bs-theme="dark"] tr.table-active th {
+            --bs-table-bg: #14223d !important;
+            --bs-table-accent-bg: transparent !important;
+            --bs-table-bg-type: transparent !important;
+            --bs-table-color: #f1f5f9 !important;
+            --bs-table-border-color: #1a2b4c !important;
+            --bs-table-hover-bg: #1a2b4c !important;
+            --bs-table-hover-color: #ffffff !important;
+            background-color: #14223d !important;
+            box-shadow: none !important;
+            color: #f1f5f9 !important;
+        }
+
+        /* Subtle badge backgrounds in Dark Mode */
+        [data-bs-theme="dark"] .bg-primary-subtle {
+            background-color: rgba(37, 99, 235, 0.22) !important;
+            color: #93c5fd !important;
+            border-color: rgba(59, 130, 246, 0.35) !important;
+        }
+        [data-bs-theme="dark"] .bg-success-subtle {
+            background-color: rgba(16, 185, 129, 0.22) !important;
+            color: #6ee7b7 !important;
+            border-color: rgba(16, 185, 129, 0.35) !important;
+        }
+        [data-bs-theme="dark"] .bg-warning-subtle {
+            background-color: rgba(245, 158, 11, 0.22) !important;
+            color: #fcd34d !important;
+            border-color: rgba(245, 158, 11, 0.35) !important;
+        }
+        [data-bs-theme="dark"] .bg-danger-subtle {
+            background-color: rgba(239, 68, 68, 0.22) !important;
+            color: #fca5a5 !important;
+            border-color: rgba(239, 68, 68, 0.35) !important;
+        }
+        [data-bs-theme="dark"] .bg-info-subtle {
+            background-color: rgba(6, 182, 212, 0.22) !important;
+            color: #67e8f9 !important;
+            border-color: rgba(6, 182, 212, 0.35) !important;
+        }
+
+        /* Text colors in Dark Mode */
         [data-bs-theme="dark"] .text-dark {
             color: #f1f5f9 !important;
         }
         [data-bs-theme="dark"] .text-muted {
             color: #94a3b8 !important;
+        }
+        [data-bs-theme="dark"] .text-primary {
+            color: #60a5fa !important;
+        }
+        [data-bs-theme="dark"] .text-danger {
+            color: #f87171 !important;
+        }
+        [data-bs-theme="dark"] .text-success {
+            color: #4ade80 !important;
+        }
+        [data-bs-theme="dark"] .text-warning {
+            color: #fbbf24 !important;
+        }
+        [data-bs-theme="dark"] .text-info {
+            color: #38bdf8 !important;
+        }
+
+        /* Outline buttons in Dark Mode */
+        [data-bs-theme="dark"] .btn-outline-secondary {
+            color: #cbd5e1 !important;
+            border-color: #334155 !important;
+        }
+        [data-bs-theme="dark"] .btn-outline-secondary:hover {
+            background-color: #334155 !important;
+            color: #ffffff !important;
+            border-color: #475569 !important;
+        }
+        [data-bs-theme="dark"] .btn-outline-primary {
+            color: #60a5fa !important;
+            border-color: #2563eb !important;
+        }
+        [data-bs-theme="dark"] .btn-outline-primary:hover {
+            background-color: #2563eb !important;
+            color: #ffffff !important;
+            border-color: #2563eb !important;
+        }
+        [data-bs-theme="dark"] .btn-outline-success {
+            color: #4ade80 !important;
+            border-color: #16a34a !important;
+        }
+        [data-bs-theme="dark"] .btn-outline-success:hover {
+            background-color: #16a34a !important;
+            color: #ffffff !important;
+            border-color: #16a34a !important;
         }
         [data-bs-theme="dark"] .form-control,
         [data-bs-theme="dark"] .form-select {
@@ -293,6 +482,213 @@
         [data-bs-theme="dark"] .badge-role-admin { background-color: rgba(37, 99, 235, 0.2); color: #93c5fd; }
         [data-bs-theme="dark"] .badge-role-gv { background-color: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
         [data-bs-theme="dark"] .badge-role-sv { background-color: rgba(148, 163, 184, 0.2); color: #cbd5e1; }
+
+        /* Nút GitHub và btn-outline-dark ở chế độ Dark Mode */
+        [data-bs-theme="dark"] .btn-outline-dark {
+            color: #ffffff !important;
+            border-color: #64748b !important;
+        }
+        [data-bs-theme="dark"] .btn-outline-dark:hover {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            border-color: #ffffff !important;
+        }
+        [data-bs-theme="dark"] .btn-outline-dark .bi-github {
+            color: #ffffff !important;
+        }
+        [data-bs-theme="dark"] .btn-outline-dark:hover .bi-github {
+            color: #0f172a !important;
+        }
+
+        /* 3. RESPONSIVE MOBILE & OFFCANVAS SIDEBAR */
+        #sidebar-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 1045;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #sidebar-backdrop.show {
+            display: block;
+            opacity: 1;
+        }
+
+        .table-responsive {
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Semester Dropdown in Topbar */
+        .semester-dropdown-btn {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .semester-dropdown-btn:hover,
+        .semester-dropdown-btn:focus {
+            background-color: #f1f5f9;
+            border-color: #94a3b8;
+            color: var(--primary-blue);
+        }
+        .semester-btn-text {
+            max-width: 220px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .semester-dropdown-menu {
+            min-width: 260px;
+            max-width: calc(100vw - 32px);
+            z-index: 1060;
+        }
+        [data-bs-theme="dark"] .semester-dropdown-btn {
+            background-color: #14223d !important;
+            border-color: #1a2b4c !important;
+            color: #93c5fd !important;
+        }
+        [data-bs-theme="dark"] .semester-dropdown-btn:hover {
+            background-color: #182848 !important;
+            border-color: #3b82f6 !important;
+        }
+
+        /* Nút Hamburger trên Mobile */
+        #sidebarToggleBtn {
+            background-color: #ffffff;
+            border-color: #cbd5e1;
+            color: var(--primary-blue);
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
+        #sidebarToggleBtn:hover {
+            background-color: #f1f5f9;
+            border-color: #94a3b8;
+        }
+        #sidebarToggleBtn .bi-list {
+            color: var(--primary-blue);
+            transition: color 0.2s ease;
+        }
+        [data-bs-theme="dark"] #sidebarToggleBtn {
+            background-color: #14223d !important;
+            border-color: #1a2b4c !important;
+            color: #93c5fd !important;
+        }
+        [data-bs-theme="dark"] #sidebarToggleBtn:hover {
+            background-color: #182848 !important;
+            border-color: #3b82f6 !important;
+        }
+        [data-bs-theme="dark"] #sidebarToggleBtn .bi-list {
+            color: #93c5fd !important;
+        }
+
+        /* Custom HTML Select Dropdowns for Mobile & Desktop */
+        .custom-select-native {
+            position: absolute !important;
+            opacity: 0 !important;
+            width: 1px !important;
+            height: 1px !important;
+            margin: -1px !important;
+            padding: 0 !important;
+            border: 0 !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            pointer-events: none !important;
+        }
+        .custom-select-dropdown {
+            position: relative;
+            width: 100%;
+        }
+        .input-group > .custom-select-dropdown {
+            flex: 1 1 auto;
+            width: 1% !important;
+            min-width: 0;
+        }
+        .input-group > .custom-select-dropdown > .custom-select-btn {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        .custom-select-btn {
+            cursor: pointer;
+            width: 100%;
+            max-width: 100%;
+            text-align: left;
+        }
+        .custom-select-btn::after {
+            display: none !important;
+        }
+        .custom-select-menu {
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+            width: 100% !important;
+            min-width: 100% !important;
+            max-width: 100% !important;
+        }
+        [data-bs-theme="dark"] .custom-select-menu {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+        }
+        button[data-bs-toggle="collapse"][aria-expanded="true"] .bi-chevron-down,
+        a[data-bs-toggle="collapse"][aria-expanded="true"] .bi-chevron-down {
+            transform: rotate(180deg);
+        }
+
+        @@media (min-width: 992px) {
+            .semester-dropdown-btn {
+                min-width: 220px;
+            }
+        }
+
+        @@media (max-width: 991.98px) {
+            #sidebar-wrapper {
+                transform: translateX(-100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                width: 280px;
+                max-width: 85vw;
+                z-index: 1050;
+                box-shadow: none;
+            }
+            #sidebar-wrapper.show {
+                transform: translateX(0);
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.4);
+            }
+            #page-content-wrapper {
+                margin-left: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0;
+                padding-top: 56px; /* Bù đắp chiều cao cho Top Navbar cố định trên Mobile */
+            }
+            .top-navbar {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                width: 100% !important;
+                z-index: 1030 !important;
+                padding: 0.6rem 0.85rem;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            }
+            [data-bs-theme="dark"] .top-navbar {
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45) !important;
+            }
+            .semester-dropdown-btn {
+                max-width: 155px;
+                padding: 0.35rem 0.55rem;
+                font-size: 0.8rem;
+            }
+            .semester-btn-text {
+                max-width: 90px;
+            }
+            .dropdown-menu {
+                max-width: calc(100vw - 20px) !important;
+            }
+            main {
+                padding: 0.85rem !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -307,6 +703,10 @@
                     <div class="fw-bold text-white" style="letter-spacing: -0.01em; font-size: 0.98rem;">KHOA CNTT - CTUET</div>
                     <small class="text-white-50 fw-normal" style="font-size: 0.72rem;">Quản Lý Thực Tập Doanh Nghiệp</small>
                 </div>
+                <!-- Nút đóng Sidebar trên mobile -->
+                <button id="sidebarCloseBtn" class="btn btn-sm btn-link text-white d-lg-none ms-auto p-1 text-decoration-none" type="button" aria-label="Đóng menu">
+                    <i class="bi bi-x-lg fs-5 opacity-75"></i>
+                </button>
             </div>
 
             <div class="sidebar-menu">
@@ -388,32 +788,54 @@
             </div>
         </div>
 
+        <!-- Backdrop che mờ khi mở Sidebar trên Mobile -->
+        <div id="sidebar-backdrop"></div>
+
         <!-- Page Content -->
-        <div id="page-content-wrapper" class="w-100">
+        <div id="page-content-wrapper">
             <!-- Top Navbar -->
             <div class="top-navbar d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center gap-2">
+                    <!-- Nút bật menu Hamburger trên Mobile -->
+                    <button id="sidebarToggleBtn" class="btn btn-sm border d-lg-none d-flex align-items-center justify-content-center shadow-none" 
+                            style="width: 36px; height: 36px;" type="button" aria-label="Mở menu">
+                        <i class="bi bi-list fs-4"></i>
+                    </button>
+
                     <div class="fw-bold text-dark d-none d-lg-block" style="font-size: 0.95rem;">
                         <i class="bi bi-mortarboard-fill text-primary me-1"></i> Khoa Công nghệ Thông tin
                         <span class="text-muted fw-normal ms-1">| Thực tập Doanh nghiệp</span>
                     </div>
+
                     @if (User.IsInRole("admin") && danhSachDot.Any())
                     {
-                        <form id="formChangeSemester" method="post" asp-area="Admin" asp-controller="DotThucTap" asp-action="ChonKy" class="d-inline-block">
+                        <form id="formChangeSemester" method="post" asp-area="Admin" asp-controller="DotThucTap" asp-action="ChonKy" class="d-inline-block m-0">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
-                            <div class="input-group input-group-sm">
-                                <span class="input-group-text bg-light text-primary border fw-semibold">
-                                    <i class="bi bi-calendar3 me-1"></i> Kỳ thực tập:
-                                </span>
-                                <select name="dotId" class="form-select border fw-bold text-primary" onchange="document.getElementById('formChangeSemester').submit();" style="min-width: 220px;">
+                            <input type="hidden" name="dotId" id="selectedDotIdInput" value="@selectedDotId" />
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-light border dropdown-toggle fw-bold text-primary d-flex align-items-center gap-1.5 semester-dropdown-btn shadow-none" 
+                                        type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-calendar3 text-primary flex-shrink-0"></i>
+                                    <span class="d-none d-sm-inline text-muted fw-semibold">Kỳ:</span>
+                                    <span class="semester-btn-text text-truncate" title="@(dotDangChon?.TenDot)">@(dotDangChon?.TenDot ?? "Chọn kỳ thực tập")</span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-start shadow-sm py-1 semester-dropdown-menu">
+                                    <li class="dropdown-header small text-muted">Chọn kỳ thực tập</li>
                                     @foreach (var dot in danhSachDot)
                                     {
-                                        <option value="@dot.Id" selected="@(dot.Id == selectedDotId ? "selected" : null)">
-                                            @dot.TenDot @(dot.TrangThaiKichHoat ? "★ (Hiện tại)" : "")
-                                        </option>
+                                        <li>
+                                            <button type="button" class="dropdown-item d-flex justify-content-between align-items-center py-2 px-3 @(dot.Id == selectedDotId ? "active fw-bold" : "")"
+                                                    onclick="document.getElementById('selectedDotIdInput').value='@dot.Id'; document.getElementById('formChangeSemester').submit();">
+                                                <span class="text-truncate me-2">@dot.TenDot</span>
+                                                @if (dot.TrangThaiKichHoat)
+                                                {
+                                                    <span class="badge bg-warning text-dark flex-shrink-0" style="font-size: 0.68rem;">★ Hiện tại</span>
+                                                }
+                                            </button>
+                                        </li>
                                     }
-                                </select>
+                                </ul>
                             </div>
                         </form>
                     }
@@ -446,7 +868,7 @@
                             _ => "Sinh viên"
                         };
 
-                        <span class="badge @badgeClass px-2.5 py-1.5 rounded-pill fs-7">
+                        <span class="badge @badgeClass px-2.5 py-1.5 rounded-pill fs-7 d-none d-sm-inline-flex align-items-center">
                             <i class="bi bi-shield-check me-1"></i>@roleName
                         </span>
 
@@ -454,9 +876,15 @@
                             <button class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2" 
                                     type="button" data-bs-toggle="dropdown">
                                 <i class="bi bi-person-circle"></i>
-                                <span>@User.Identity.Name</span>
+                                <span class="d-none d-sm-inline">@User.Identity.Name</span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                <li class="dropdown-header d-sm-none text-truncate fw-bold">
+                                    <small class="text-muted d-block">Đang đăng nhập:</small>
+                                    @User.Identity.Name
+                                    <span class="badge @badgeClass ms-1">@roleName</span>
+                                </li>
+                                <li><hr class="dropdown-divider d-sm-none"></li>
                                 <li>
                                     <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
                                         @Html.AntiForgeryToken()
@@ -478,7 +906,7 @@
             </div>
 
             <!-- Main Body -->
-            <main class="p-4 flex-grow-1">
+            <main class="p-2.5 p-sm-3 p-md-4 flex-grow-1">
                 @if (TempData["Success"] != null)
                 {
                     <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2" role="alert">
@@ -542,6 +970,169 @@
                     applyTheme(newTheme);
                 });
             }
+
+            // Xử lý Mobile Sidebar Offcanvas
+            const sidebar = document.getElementById('sidebar-wrapper');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            const toggleBtnSidebar = document.getElementById('sidebarToggleBtn');
+            const closeBtnSidebar = document.getElementById('sidebarCloseBtn');
+
+            function openSidebar() {
+                if (sidebar) sidebar.classList.add('show');
+                if (backdrop) backdrop.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeSidebar() {
+                if (sidebar) sidebar.classList.remove('show');
+                if (backdrop) backdrop.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+
+            if (toggleBtnSidebar) toggleBtnSidebar.addEventListener('click', openSidebar);
+            if (closeBtnSidebar) closeBtnSidebar.addEventListener('click', closeSidebar);
+            if (backdrop) backdrop.addEventListener('click', closeSidebar);
+
+            // Tự động đóng sidebar khi bấm link menu trên mobile
+            document.querySelectorAll('.sidebar-menu .nav-link-custom').forEach(function (link) {
+                link.addEventListener('click', function () {
+                    if (window.innerWidth < 992) {
+                        closeSidebar();
+                    }
+                });
+            });
+
+            // Đóng khi nhấn phím Escape
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') closeSidebar();
+            });
+
+            // Tự động đóng nếu người dùng mở rộng màn hình sang desktop
+            window.addEventListener('resize', function () {
+                if (window.innerWidth >= 992) {
+                    closeSidebar();
+                }
+            });
+
+            // Khởi tạo Custom Dropdown HTML cho các thẻ <select> dạng form-select (đặc biệt trong bộ lọc)
+            // Giúp giao diện mobile đồng bộ, đẹp mắt, không bị lỗi native popup Windows phóng to tràn màn hình
+            function initCustomSelects(container) {
+                const root = container || document;
+                root.querySelectorAll('form select.form-select:not(.no-custom-select):not([multiple])').forEach(function (select) {
+                    if (select.dataset.customized === 'true') return;
+                    select.dataset.customized = 'true';
+
+                    // Ẩn select gốc một cách an toàn (vẫn hỗ trợ form submit & required validation)
+                    select.classList.add('custom-select-native');
+
+                    // Tạo container dropdown bọc ngoài
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'dropdown custom-select-dropdown w-100';
+
+                    // Tạo nút bấm giả lập y hệt form-select
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'form-select custom-select-btn d-flex align-items-center justify-content-between ' + 
+                        (select.classList.contains('form-select-sm') ? 'form-select-sm ' : '') +
+                        (select.classList.contains('form-select-lg') ? 'form-select-lg ' : '');
+                    btn.setAttribute('data-bs-toggle', 'dropdown');
+                    btn.setAttribute('data-bs-auto-close', 'true');
+                    btn.setAttribute('aria-expanded', 'false');
+
+                    const labelSpan = document.createElement('span');
+                    labelSpan.className = 'text-truncate me-2';
+
+                    const currentOpt = select.options[select.selectedIndex] || select.options[0];
+                    labelSpan.textContent = currentOpt ? currentOpt.text : '';
+                    btn.appendChild(labelSpan);
+
+                    // Menu danh sách các lựa chọn
+                    const menu = document.createElement('ul');
+                    menu.className = 'dropdown-menu w-100 shadow-sm custom-select-menu py-1';
+                    menu.style.maxHeight = '260px';
+                    menu.style.overflowY = 'auto';
+
+                    function renderOptions() {
+                        menu.innerHTML = '';
+                        Array.from(select.options).forEach(function (opt, index) {
+                            const li = document.createElement('li');
+                            const itemBtn = document.createElement('button');
+                            itemBtn.type = 'button';
+                            itemBtn.className = 'dropdown-item py-2 px-3 d-flex align-items-center justify-content-between ' + 
+                                (opt.selected ? 'active fw-bold' : '');
+                            
+                            const optText = document.createElement('span');
+                            optText.className = 'text-truncate';
+                            optText.textContent = opt.text;
+                            itemBtn.appendChild(optText);
+
+                            if (opt.selected) {
+                                const icon = document.createElement('i');
+                                icon.className = 'bi bi-check2 ms-2';
+                                itemBtn.appendChild(icon);
+                            }
+
+                            itemBtn.addEventListener('click', function (e) {
+                                e.preventDefault();
+                                select.selectedIndex = index;
+                                select.value = opt.value;
+                                labelSpan.textContent = opt.text;
+
+                                menu.querySelectorAll('.dropdown-item').forEach(function (b, i) {
+                                    b.classList.toggle('active', i === index);
+                                    b.classList.toggle('fw-bold', i === index);
+                                    const ic = b.querySelector('.bi-check2');
+                                    if (ic) ic.remove();
+                                    if (i === index) {
+                                        const newIc = document.createElement('i');
+                                        newIc.className = 'bi bi-check2 ms-2';
+                                        b.appendChild(newIc);
+                                    }
+                                });
+
+                                // Kích hoạt sự kiện onchange cho select
+                                select.dispatchEvent(new Event('change', { bubbles: true }));
+                            });
+
+                            li.appendChild(itemBtn);
+                            menu.appendChild(li);
+                        });
+                    }
+
+                    renderOptions();
+
+                    // Lắng nghe nếu select thay đổi giá trị bằng code JS hoặc reset form
+                    select.addEventListener('change', function () {
+                        const cur = select.options[select.selectedIndex];
+                        if (cur) {
+                            labelSpan.textContent = cur.text;
+                            menu.querySelectorAll('.dropdown-item').forEach(function (b, i) {
+                                b.classList.toggle('active', i === select.selectedIndex);
+                                b.classList.toggle('fw-bold', i === select.selectedIndex);
+                            });
+                        }
+                    });
+
+                    // Lắng nghe nếu danh sách option thay đổi động qua MutationObserver
+                    const observer = new MutationObserver(function () {
+                        renderOptions();
+                        const cur = select.options[select.selectedIndex];
+                        if (cur) labelSpan.textContent = cur.text;
+                    });
+                    observer.observe(select, { childList: true });
+
+                    wrapper.appendChild(btn);
+                    wrapper.appendChild(menu);
+                    select.parentNode.insertBefore(wrapper, select.nextSibling);
+                });
+            }
+
+            initCustomSelects();
+
+            // Khởi tạo lại nếu có modal hoặc nội dung động nạp sau
+            document.addEventListener('shown.bs.modal', function (e) {
+                initCustomSelects(e.target);
+            });
         });
     </script>
     @await RenderSectionAsync("Scripts", required: false)
